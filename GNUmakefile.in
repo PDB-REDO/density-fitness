@@ -171,7 +171,7 @@ install: $(PROGRAM)
 	install -d $(bindir)
 	install $(PROGRAM) $(bindir)/$(PROGRAM)
 	install -d $(mandir)/man1
-	install -m 644 $(PROGRAM).1 $(mandir)/man1/$(PROGRAM).1;
+	install -m 644 doc/$(PROGRAM).1 $(mandir)/man1/$(PROGRAM).1;
 	gzip $(mandir)/man1/$(PROGRAM).1;
 
 .PHONY: FORCE

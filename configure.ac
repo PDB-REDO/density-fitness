@@ -129,8 +129,11 @@ pkg-config.])])
 			],
 			[AC_MSG_ERROR([libcif++ not found])])
 	fi
+
+	AS_IF([ test -f /var/cache/libcifpp/mmcif_pdbx_v50.dic ], [LIBCIFPP_DATA_DIR=/var/cache/libcifpp ])
 ])
 
+AC_ARG_VAR([LIBCIFPP_DATA_DIR], [Directory containing mmcif_pdbx_v50.dic file])
 AC_SUBST([LIBCIFPP_DATA_DIR], [$LIBCIFPP_DATA_DIR])
 
 dnl Check for libzeep
@@ -211,8 +214,12 @@ pkg-config.])])
 			],
 			[AC_MSG_ERROR([libpdb-redo not found])])
 	fi
+
+	AS_IF([ test -f /usr/share/libpdb-redo/bond-info.bin ], [LIBPDB_REDO_DATA_DIR=/usr/share/libpdb-redo])
+	AS_IF([ test -f /usr/local/share/libpdb-redo/bond-info.bin ], [LIBPDB_REDO_DATA_DIR=/usr/local/share/libpdb-redo])
 ])
 
+AC_ARG_VAR([LIBPDB_REDO_DATA_DIR], [Directory containing bond-info.bin file])
 AC_SUBST([LIBPDB_REDO_DATA_DIR], [$LIBPDB_REDO_DATA_DIR])
 
 dnl Check for libclipper

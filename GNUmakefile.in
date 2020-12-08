@@ -64,7 +64,7 @@ DEFINES				+= VERSION='"$(VERSION)"'
 
 CXXFLAGS            += -Wall -Wno-multichar
 
-LIBCIF_DATA_DIR		= @LIBCIF_DATA_DIR@
+LIBCIFPP_DATA_DIR	= @LIBCIFPP_DATA_DIR@
 LIBPDB_REDO_DATA_DIR= @LIBPDB_REDO_DATA_DIR@
 
 # Use the DEBUG flag to build debug versions of the code
@@ -147,8 +147,6 @@ OBJECTS += $(OBJDIR)/$(PROGRAM)_rsrc.o
 
 $(OBJDIR)/$(PROGRAM)_rsrc.o: $(LIBPDB_REDO_DATA_DIR)/bond-info.bin $(LIBCIF_DATA_DIR)/mmcif_pdbx_v50.cif
 	$(MRC) -o $@ $^
-
-$(OBJDIR)/$(PROGRAM).o: src/mrsrc.hpp
 
 endif
 

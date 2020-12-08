@@ -202,7 +202,7 @@ int pr_main(int argc, char* argv[])
 
 	bool formatAsJSON = true;
 	if (vm.count("output-format"))
-		formatAsJSON = vm["output-format"].as<std::string>() == "eds";
+		formatAsJSON = vm["output-format"].as<std::string>() != "eds";
 
 	std::ofstream of;
 	io::filtering_stream<io::output> out;
@@ -234,6 +234,8 @@ int pr_main(int argc, char* argv[])
 		
 		out.push(of);
 	}
+	else
+		out.push(std::cout);
 
 	if (formatAsJSON)
 	{

@@ -629,15 +629,16 @@ CLIPPER_LDFLAGS
 CLIPPER_CPPFLAGS
 CLIPPER_LIBS
 CLIPPER_CFLAGS
+LIBPDB_REDO_DATA_DIR
 PDB_REDO_LDFLAGS
 PDB_REDO_CPPFLAGS
-PDB_REDO_RSRC
 PDB_REDO_LIBS
 PDB_REDO_CFLAGS
 ZEEP_LDFLAGS
 ZEEP_CPPFLAGS
 ZEEP_LIBS
 ZEEP_CFLAGS
+LIBCIFPP_DATA_DIR
 CIFPP_LDFLAGS
 CIFPP_CPPFLAGS
 AX_PACKAGE_REQUIRES_PRIVATE
@@ -645,7 +646,6 @@ AX_PACKAGE_REQUIRES
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
-CIFPP_RSRC
 CIFPP_LIBS
 CIFPP_CFLAGS
 BOOST_IOSTREAMS_LIB
@@ -762,6 +762,7 @@ CIFPP_CFLAGS
 CIFPP_LIBS
 CIFPP_CPPFLAGS
 CIFPP_LDFLAGS
+LIBCIFPP_DATA_DIR
 ZEEP_CFLAGS
 ZEEP_LIBS
 ZEEP_CPPFLAGS
@@ -770,6 +771,7 @@ PDB_REDO_CFLAGS
 PDB_REDO_LIBS
 PDB_REDO_CPPFLAGS
 PDB_REDO_LDFLAGS
+LIBPDB_REDO_DATA_DIR
 CLIPPER_CFLAGS
 CLIPPER_LIBS
 CLIPPER_CPPFLAGS
@@ -1456,6 +1458,8 @@ Some influential environment variables:
               C preprocessor flags for CIFPP headers
   CIFPP_LDFLAGS
               linker flags for CIFPP libraries
+  LIBCIFPP_DATA_DIR
+              Directory containing mmcif_pdbx_v50.dic file
   ZEEP_CFLAGS C compiler flags for ZEEP, overriding pkg-config
   ZEEP_LIBS   linker flags for ZEEP, overriding pkg-config
   ZEEP_CPPFLAGS
@@ -1470,6 +1474,8 @@ Some influential environment variables:
               C preprocessor flags for PDB_REDO headers
   PDB_REDO_LDFLAGS
               linker flags for PDB_REDO libraries
+  LIBPDB_REDO_DATA_DIR
+              Directory containing bond-info.bin file
   CLIPPER_CFLAGS
               C compiler flags for CLIPPER, overriding pkg-config
   CLIPPER_LIBS
@@ -6660,7 +6666,7 @@ fi
 
 			CIFPP_CFLAGS="-I ${withval}/include"
 			CIFPP_LIBS="-L${withval}/.libs -lcifpp"
-			CIFPP_RSRC="${withval}/rsrc"
+			LIBCIFPP_DATA_DIR="${withval}/rsrc/dictionaries"
 
 			CIFPP_CFLAGS=$CIFPP_CFLAGS
 
@@ -6668,9 +6674,6 @@ fi
 
 
 fi
-
-
-CIFPP_RSRC=$CIFPP_RSRC
 
 
 
@@ -7011,7 +7014,7 @@ fi
 $as_echo "#define HAVE_CIFPP 1" >>confdefs.h
 
 
-					 LIBS="-lcifpp $LIBS"
+				LIBS="-lcifpp $LIBS"
 
 else
   as_fn_error $? "libcif++ not found" "$LINENO" 5
@@ -7019,7 +7022,15 @@ fi
 
 	fi
 
+	if  test -f /var/cache/libcifpp/mmcif_pdbx_v50.dic ; then :
+  LIBCIFPP_DATA_DIR=/var/cache/libcifpp
 fi
+
+fi
+
+
+LIBCIFPP_DATA_DIR=$LIBCIFPP_DATA_DIR
+
 
 
 
@@ -7245,7 +7256,7 @@ fi
 
 			PDB_REDO_CFLAGS="-I ${withval}/include"
 			PDB_REDO_LIBS="-L${withval}/.libs -lpdb-redo"
-			PDB_REDO_RSRC="${withval}/rsrc"
+			LIBPDB_REDO_DATA_DIR="${withval}/rsrc"
 
 			PDB_REDO_CFLAGS=$PDB_REDO_CFLAGS
 
@@ -7253,9 +7264,6 @@ fi
 
 
 fi
-
-
-PDB_REDO_RSRC=$PDB_REDO_RSRC
 
 
 if test "x$PDB_REDO_LIBS" = "x"; then :
@@ -7476,7 +7484,7 @@ fi
 $as_echo "#define HAVE_PDB_REDO 1" >>confdefs.h
 
 
-					 LIBS="-lpdb-redo $LIBS"
+				LIBS="-lpdb-redo $LIBS"
 
 else
   as_fn_error $? "libpdb-redo not found" "$LINENO" 5
@@ -7484,7 +7492,18 @@ fi
 
 	fi
 
+	if  test -f /usr/share/libpdb-redo/bond-info.bin ; then :
+  LIBPDB_REDO_DATA_DIR=/usr/share/libpdb-redo
 fi
+	if  test -f /usr/local/share/libpdb-redo/bond-info.bin ; then :
+  LIBPDB_REDO_DATA_DIR=/usr/local/share/libpdb-redo
+fi
+
+fi
+
+
+LIBPDB_REDO_DATA_DIR=$LIBPDB_REDO_DATA_DIR
+
 
 
 

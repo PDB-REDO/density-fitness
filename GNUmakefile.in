@@ -145,7 +145,7 @@ ifneq "$(USE_RSRC)" "0"
 
 OBJECTS += $(OBJDIR)/$(PROGRAM)_rsrc.o
 
-$(OBJDIR)/$(PROGRAM)_rsrc.o: $(LIBPDB_REDO_DATA_DIR)/bond-info.bin $(LIBCIF_DATA_DIR)/mmcif_pdbx_v50.cif
+$(OBJDIR)/$(PROGRAM)_rsrc.o: $(LIBPDB_REDO_DATA_DIR)/bond-info.bin $(LIBCIFPP_DATA_DIR)/mmcif_pdbx_v50.cif
 	$(MRC) -o $@ $^
 
 endif
@@ -173,10 +173,6 @@ install: $(PROGRAM)
 	install -d $(mandir)/man1
 	install -m 644 $(PROGRAM).1 $(mandir)/man1/$(PROGRAM).1;
 	gzip $(mandir)/man1/$(PROGRAM).1;
-ifeq "$(USE_RSRC)" "0"
-	install -d $(DATADIR)
-	for d in rama-data.bin  torsion-data.bin; do install -m644 rsrc/$$d $(DATADIR)/$$d; done
-endif
 
 .PHONY: FORCE
 FORCE:

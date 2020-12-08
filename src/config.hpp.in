@@ -3,11 +3,17 @@
 /* define if the Boost library is available */
 #undef HAVE_BOOST
 
+/* define if the Boost::IOStreams library is available */
+#undef HAVE_BOOST_IOSTREAMS
+
 /* define if the Boost::PROGRAM_OPTIONS library is available */
 #undef HAVE_BOOST_PROGRAM_OPTIONS
 
 /* Define to 1 if CIFPP is found */
 #undef HAVE_CIFPP
+
+/* Use libclipper */
+#undef HAVE_CLIPPER
 
 /* define if the compiler supports basic C++17 syntax */
 #undef HAVE_CXX17

@@ -1,0 +1,13 @@
+obj.dbg/
+obj/
+autom4te.cache/
+config.log
+config.status
+density-fitness
+GNUmakefile
+version-info-*.txt
+.vscode/
+aclocal.m4
+src/config.hpp
+src/revision.hpp
+src/config.hpp.in~

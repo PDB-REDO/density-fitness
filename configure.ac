@@ -82,6 +82,7 @@ AC_TRY_LINK(
 
 AX_BOOST_BASE([1.65.1], [], [AC_MSG_ERROR([Could not find a recent version of boost])])
 AX_BOOST_PROGRAM_OPTIONS
+AX_BOOST_IOSTREAMS
 
 CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
 LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
@@ -100,13 +101,11 @@ AC_ARG_WITH([cif++],
 
 			CIFPP_CFLAGS="-I ${withval}/include"
 			CIFPP_LIBS="-L${withval}/.libs -lcifpp"
-			CIFPP_RSRC="${withval}/rsrc"
+			LIBCIFPP_DATA_DIR="${withval}/rsrc/dictionaries"
 
 			AC_SUBST([CIFPP_CFLAGS], [$CIFPP_CFLAGS])
 			AC_SUBST([CIFPP_LIBS], [$CIFPP_LIBS])
 		])
-
-AC_SUBST([CIFPP_RSRC], [$CIFPP_RSRC])
 
 AS_IF([test "x$CIFPP_LIBS" = "x"], [
 	AC_PATH_PROG([PKG_CONFIG], [pkg-config])
@@ -124,13 +123,15 @@ Can't find the libcif++ header, Config.hpp.  Make sure that it
 is installed, and either use the --with-cif++ option or install
 pkg-config.])])
 
-			AX_CHECK_LIBRARY([CIFPP], [cif++/Config.hpp], [cifpp],
-				 [
-					 LIBS="-lcifpp $LIBS"
-				 ],
-                 [AC_MSG_ERROR([libcif++ not found])])
+		AX_CHECK_LIBRARY([CIFPP], [cif++/Config.hpp], [cifpp],
+			[
+				LIBS="-lcifpp $LIBS"
+			],
+			[AC_MSG_ERROR([libcif++ not found])])
 	fi
 ])
+
+AC_SUBST([LIBCIFPP_DATA_DIR], [$LIBCIFPP_DATA_DIR])
 
 dnl Check for libzeep
 
@@ -162,9 +163,9 @@ Can't find the libzeep header, zeep/json/element.hpp.  Make sure that libzeep
 is installed, and either use the --with-zeep option or install
 pkg-config.])])
 
-			AX_CHECK_LIBRARY([ZEEP], [zeep/json/element.hpp], [zeep],
-					[ LIBS="-lzeep-json $LIBS" ],
-					[AC_MSG_ERROR([libzeep not found])])
+		AX_CHECK_LIBRARY([ZEEP], [zeep/json/element.hpp], [zeep],
+			[ LIBS="-lzeep-json $LIBS" ],
+			[AC_MSG_ERROR([libzeep not found])])
 	fi
 ])
 
@@ -182,13 +183,11 @@ AC_ARG_WITH([pdb-redo],
 
 			PDB_REDO_CFLAGS="-I ${withval}/include"
 			PDB_REDO_LIBS="-L${withval}/.libs -lpdb-redo"
-			PDB_REDO_RSRC="${withval}/rsrc"
+			LIBPDB_REDO_DATA_DIR="${withval}/rsrc"
 
 			AC_SUBST([PDB_REDO_CFLAGS], [$PDB_REDO_CFLAGS])
 			AC_SUBST([PDB_REDO_LIBS], [$PDB_REDO_LIBS])
 		])
-
-AC_SUBST([PDB_REDO_RSRC], [$PDB_REDO_RSRC])
 
 AS_IF([test "x$PDB_REDO_LIBS" = "x"], [
 	AC_PATH_PROG([PKG_CONFIG], [pkg-config])
@@ -206,13 +205,15 @@ Can't find the libpdb-redo header, Config.hpp.  Make sure that it
 is installed, and either use the --with-pdb-redo option or install
 pkg-config.])])
 
-			AX_CHECK_LIBRARY([PDB_REDO], [pdb-redo/Config.hpp], [pdb-redo],
-				 [
-					 LIBS="-lpdb-redo $LIBS"
-				 ],
-                 [AC_MSG_ERROR([libpdb-redo not found])])
+		AX_CHECK_LIBRARY([PDB_REDO], [pdb-redo/Config.hpp], [pdb-redo],
+			[
+				LIBS="-lpdb-redo $LIBS"
+			],
+			[AC_MSG_ERROR([libpdb-redo not found])])
 	fi
 ])
+
+AC_SUBST([LIBPDB_REDO_DATA_DIR], [$LIBPDB_REDO_DATA_DIR])
 
 dnl Check for libclipper
 

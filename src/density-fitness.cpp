@@ -36,6 +36,9 @@
 #include <filesystem>
 
 #include <boost/program_options.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 
 #include "zeep/json/element.hpp"
 
@@ -45,6 +48,7 @@
 namespace po = boost::program_options;
 namespace fs = std::filesystem;
 namespace c = mmcif;
+namespace io = boost::iostreams;
 
 std::string VERSION_STRING;
 
@@ -55,24 +59,24 @@ int pr_main(int argc, char* argv[])
 	po::options_description visible_options(fs::path(argv[0]).filename().string() + " [options] <mtzfile> <coordinatesfile> [<output>]");
 	visible_options.add_options()
 		("hklin",				po::value<std::string>(),	"mtz file")
-		("recalc",										"Recalculate Fc from FP/SIGFP in mtz file")
+		("recalc",											"Recalculate Fc from FP/SIGFP in mtz file")
 		("aniso-scaling",		po::value<std::string>(),	"Anisotropic scaling (none/observed/calculated)")
-		("no-bulk",										"No bulk correction")
+		("no-bulk",											"No bulk correction")
 		("xyzin",				po::value<std::string>(),	"coordinates file")
 		("fomap",				po::value<std::string>(),	"Fo map file -- 2mFo - DFc")
 		("dfmap",				po::value<std::string>(),	"difference map file -- 2(mFo - DFc)")
-		("reshi",				po::value<float>(),		"High resolution")
-		("reslo",				po::value<float>(),		"Low resolution")
-		("sampling-rate",		po::value<float>(),		"Sampling rate")
-		("electron-scattering",							"Use electron scattering factors")
-		("no-edia",										"Skip EDIA score calculation")
+		("reshi",				po::value<float>(),			"High resolution")
+		("reslo",				po::value<float>(),			"Low resolution")
+		("sampling-rate",		po::value<float>(),			"Sampling rate")
+		("electron-scattering",								"Use electron scattering factors")
+		("no-edia",											"Skip EDIA score calculation")
 		("output,o",			po::value<std::string>(),	"Write output to this file instead of stdout")
 		("output-format",		po::value<std::string>(),	"Output format, can be either 'edstats' or 'json'")
-		("use-auth-ids",								"Write auth_ identities instead of label_")
+		("use-auth-ids",									"Write auth_ identities instead of label_")
 		("dict",				po::value<std::string>(),	"Dictionary file containing restraints for residues in this specific target")
-		("help,h",										"Display help message")
-		("version",										"Print version")
-		("verbose,v",									"Verbose output")
+		("help,h",											"Display help message")
+		("version",											"Print version")
+		("verbose,v",										"Verbose output")
 		;
 	
 	po::options_description hidden_options("hidden options");
@@ -196,19 +200,42 @@ int pr_main(int argc, char* argv[])
 		r = collector.collect();
 	}
 
+	bool formatAsJSON = true;
+	if (vm.count("output-format"))
+		formatAsJSON = vm["output-format"].as<std::string>() == "eds";
+
 	std::ofstream of;
+	io::filtering_stream<io::output> out;
+
 	if (vm.count("output"))
 	{
-		of.open(vm["output"].as<std::string>());
+		fs::path output = vm["output"].as<std::string>();
+
+		of.open(output);
 		if (not of.is_open())
 		{
 			std::cerr << "Could not open output file" << std::endl;
 			exit(1);
 		}
-		std::cout.rdbuf(of.rdbuf());
+
+		if (output.extension() == ".gz")
+		{
+			out.push(io::gzip_compressor());
+			output = output.stem();
+		}
+		else if (output.extension() == ".bz2")
+		{
+			out.push(io::bzip2_compressor());
+			output = output.stem();
+		}
+
+		if (vm.count("output-format") == 0 and output.extension() == ".eds")
+			formatAsJSON = false;
+		
+		out.push(of);
 	}
 
-	if (vm.count("output-format") and vm["output-format"].as<std::string>() == "json")
+	if (formatAsJSON)
 	{
 		using object = zeep::json::element;
 
@@ -239,17 +266,17 @@ int pr_main(int argc, char* argv[])
 			});
 		}
 		
-		std::cout << stats << std::endl;
+		out << stats << std::endl;
 	}
 	else
 	{
-		std::cout << "RESIDUE" << '\t'
-			 << "RSR" << '\t'
-			 << "SRSR" << '\t'
-			 << "RSCCS" << '\t'
-			 << "NGRID" << '\t'
-			 << "EDIAm" << '\t'
-			 << "OPIA" << std::endl;
+		out << "RESIDUE" << '\t'
+			<< "RSR" << '\t'
+			<< "SRSR" << '\t'
+			<< "RSCCS" << '\t'
+			<< "NGRID" << '\t'
+			<< "EDIAm" << '\t'
+			<< "OPIA" << std::endl;
 	
 		bool writeAuth = vm.count("use-auth-ids");
 	
@@ -267,14 +294,14 @@ int pr_main(int argc, char* argv[])
 			else
 				id = i.compID + '_' + i.asymID + '_' + std::to_string(i.seqID);
 			
-			std::cout << std::fixed << std::setprecision(3)
-				 << id << '\t'
-				 << i.RSR << '\t'
-				 << i.SRSR << '\t'
-				 << i.RSCCS << '\t'
-				 << i.ngrid << '\t'
-				 << i.EDIAm << '\t'
-				 << std::setprecision(1) << i.OPIA << std::endl;
+			out << std::fixed << std::setprecision(3)
+				<< id << '\t'
+				<< i.RSR << '\t'
+				<< i.SRSR << '\t'
+				<< i.RSCCS << '\t'
+				<< i.ngrid << '\t'
+				<< i.EDIAm << '\t'
+				<< std::setprecision(1) << i.OPIA << std::endl;
 		}
 	}
 	

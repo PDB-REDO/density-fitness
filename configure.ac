@@ -19,6 +19,7 @@ AC_DEFUN([read_test], [AC_LANG_SOURCE(
 	esyscmd(config/tools/m4esc.sh config/test/$1))])
 
 AC_PROG_INSTALL
+PKG_PROG_PKG_CONFIG
 
 AX_PTHREAD
 
@@ -108,7 +109,6 @@ AC_ARG_WITH([cif++],
 		])
 
 AS_IF([test "x$CIFPP_LIBS" = "x"], [
-	PKG_PROG_PKG_CONFIG
 	if test -x "$PKG_CONFIG"
 	then
 		AX_PKG_CHECK_MODULES([CIFPP], [libcifpp], [], [], [AC_MSG_ERROR([the required package libcif++ is not installed])])
@@ -193,7 +193,6 @@ AC_ARG_WITH([pdb-redo],
 		])
 
 AS_IF([test "x$PDB_REDO_LIBS" = "x"], [
-	AC_PATH_PROG([PKG_CONFIG], [pkg-config])
 	if test -x "$PKG_CONFIG"
 	then
 		AX_PKG_CHECK_MODULES([PDB_REDO], [libpdb-redo], [], [], [AC_MSG_ERROR([the required package libpdb-redo is not installed])])

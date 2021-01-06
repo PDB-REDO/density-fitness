@@ -37,9 +37,9 @@ if test "x$MRC" = "x"; then
 else
 	AC_ARG_ENABLE(
 		resources,
-		[AS_HELP_STRING([--disable-resources], [Do not use mrc to store data in resources])])
+		[AS_HELP_STRING([--enable-resources], [Use mrc to store data in resources])])
 
-	AS_IF([test "x$enable_resources" != "xno" ], [
+	AS_IF([test "x$enable_resources" = "xyes" ], [
 		USE_RSRC=1
 	])
 fi
@@ -108,7 +108,7 @@ AC_ARG_WITH([cif++],
 		])
 
 AS_IF([test "x$CIFPP_LIBS" = "x"], [
-	AC_PATH_PROG([PKG_CONFIG], [pkg-config])
+	PKG_PROG_PKG_CONFIG
 	if test -x "$PKG_CONFIG"
 	then
 		AX_PKG_CHECK_MODULES([CIFPP], [libcifpp], [], [], [AC_MSG_ERROR([the required package libcif++ is not installed])])

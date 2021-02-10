@@ -116,7 +116,7 @@ AS_IF([test "x$CIFPP_LIBS" = "x"], [
 		AX_PKG_CHECK_MODULES([CIFPP], [libcifpp], [], [], [AC_MSG_ERROR([the required package libcif++ is not installed])])
 	else
 		AC_CHECK_HEADER(
-	        [cif++/Config.hpp],
+	        [cif++/Cif++.hpp],
 	        [
 				dnl CIFPP_CFLAGS="-I ${withval}/include"
 			],
@@ -125,7 +125,7 @@ Can't find the libcif++ header, Config.hpp.  Make sure that it
 is installed, and either use the --with-cif++ option or install
 pkg-config.])])
 
-		AX_CHECK_LIBRARY([CIFPP], [cif++/Config.hpp], [cifpp],
+		AX_CHECK_LIBRARY([CIFPP], [cif++/Cif++.hpp], [cifpp],
 			[
 				LIBS="-lcifpp $LIBS"
 			],

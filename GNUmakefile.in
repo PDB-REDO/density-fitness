@@ -29,13 +29,15 @@ firstTarget: all
 CXX					= @CXX@
 CXXFLAGS			= @CXXFLAGS@ @CPPFLAGS@ @PTHREAD_CFLAGS@ @CIFPP_CFLAGS@ @ZEEP_CFLAGS@ @PDB_REDO_CFLAGS@ @CLIPPER_CFLAGS@
 LDFLAGS				= @LDFLAGS@ @PTHREAD_CFLAGS@
-LIBS				= @LIBS@ \
-					  @CIFPP_LIBS@ \
+LIBS				= @CIFPP_LIBS@ \
 					  @ZEEP_LIBS@ \
 					  @PDB_REDO_LIBS@ \
 					  @CLIPPER_LIBS@ \
 					  @BOOST_PROGRAM_OPTIONS_LIB@ \
-					  @BOOST_IOSTREAMS_LIB@
+					  @BOOST_IOSTREAMS_LIB@ \
+					  @BOOST_REGEX_LIB@ \
+					  @DLIB_LIBS@ @NEWUOA_LIBS@ \
+					  @LIBS@
 
 prefix				= @prefix@
 exec_prefix			= @exec_prefix@

@@ -321,7 +321,7 @@ void load_version_info()
 	const std::regex
 		rxVersionNr(R"(build-(\d+)-g[0-9a-f]{7}(-dirty)?)"),
 		rxVersionDate(R"(Date: +(\d{4}-\d{2}-\d{2}).*)"),
-		rxVersionNr2(R"(tortoize-version: (\d+(?:\.\d+)+))");
+		rxVersionNr2(R"(density-fitness-version: (\d+(?:\.\d+)+))");
 
 #include "revision.hpp"
 

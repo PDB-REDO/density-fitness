@@ -7532,7 +7532,7 @@ else
 fi
 
 			ZEEP_CFLAGS="-I ${withval}/include"
-			ZEEP_LIBS="-L${withval}/.libs -lzeep-json"
+			ZEEP_LIBS="-L${withval}/.libs -lzeep"
 
 			ZEEP_CFLAGS=$ZEEP_CFLAGS
 
@@ -7718,7 +7718,7 @@ fi
 
 $as_echo "#define HAVE_ZEEP 1" >>confdefs.h
 
-     LIBS="-lzeep-json $LIBS"
+     LIBS="-lzeep $LIBS"
 else
   as_fn_error $? "libzeep not found" "$LINENO" 5
 fi

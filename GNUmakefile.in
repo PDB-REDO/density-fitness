@@ -35,6 +35,7 @@ LIBS				= @CIFPP_LIBS@ \
 					  @CLIPPER_LIBS@ \
 					  @BOOST_PROGRAM_OPTIONS_LIB@ \
 					  @BOOST_IOSTREAMS_LIB@ \
+					  @BOOST_DATE_TIME_LIB@ \
 					  @BOOST_REGEX_LIB@ \
 					  @DLIB_LIBS@ @NEWUOA_LIBS@ \
 					  @LIBS@
@@ -147,7 +148,19 @@ ifneq "$(USE_RSRC)" "0"
 
 OBJECTS += $(OBJDIR)/$(PROGRAM)_rsrc.o
 
-$(OBJDIR)/$(PROGRAM)_rsrc.o: $(LIBPDB_REDO_DATA_DIR)/bond-info.bin $(LIBCIFPP_DATA_DIR)/mmcif_pdbx_v50.cif
+rsrc:
+	@ mkdir -p $@
+
+rsrc/%.dic: $(LIBCIFPP_DATA_DIR)/%.dic.gz | rsrc
+	gzcat $^ > $@
+
+rsrc/%.dic: $(LIBCIFPP_DATA_DIR)/%.dic | rsrc
+	ln -fs $^ $@
+
+rsrc/bond-info.bin: $(LIBPDB_REDO_DATA_DIR)/bond-info.bin.gz | rsrc
+	ln -s $^ $@
+
+$(OBJDIR)/$(PROGRAM)_rsrc.o: rsrc/bond-info.bin rsrc/mmcif_pdbx_v50.dic
 	$(MRC) -o $@ $^
 
 endif

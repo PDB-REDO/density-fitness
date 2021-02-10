@@ -38,9 +38,9 @@ if test "x$MRC" = "x"; then
 else
 	AC_ARG_ENABLE(
 		resources,
-		[AS_HELP_STRING([--enable-resources], [Use mrc to store data in resources])])
+		[AS_HELP_STRING([--disable-resources], [Use mrc to store data in resources])])
 
-	AS_IF([test "x$enable_resources" = "xyes" ], [
+	AS_IF([test "x$enable_resources" != "xno" ], [
 		USE_RSRC=1
 	])
 fi
@@ -84,6 +84,7 @@ AC_TRY_LINK(
 AX_BOOST_BASE([1.65.1], [], [AC_MSG_ERROR([Could not find a recent version of boost])])
 AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_IOSTREAMS
+AX_BOOST_DATE_TIME
 AX_BOOST_REGEX
 
 CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
@@ -103,7 +104,7 @@ AC_ARG_WITH([cif++],
 
 			CIFPP_CFLAGS="-I ${withval}/include"
 			CIFPP_LIBS="-L${withval}/.libs -lcifpp"
-			LIBCIFPP_DATA_DIR="${withval}/rsrc/dictionaries"
+			LIBCIFPP_DATA_DIR="${withval}/rsrc"
 
 			AC_SUBST([CIFPP_CFLAGS], [$CIFPP_CFLAGS])
 			AC_SUBST([CIFPP_LIBS], [$CIFPP_LIBS])

@@ -266,6 +266,10 @@ AC_COMPILE_IFELSE(
 
 AC_DEFINE([HAVE_CLIPPER], [1], [Use libclipper])
 
+dnl fftw libraries
+AX_CHECK_LIBRARY([FFTW], [fftw.h], [fftw], [ LIBS="-lfftw $LIBS" ])
+AX_CHECK_LIBRARY([RFFTW], [rfftw.h], [rfftw], [ LIBS="-lrfftw $LIBS" ])
+
 AX_CHECK_LIBRARY([DLIB], [dlib/global_optimization.h], [dlib],
 		[
 			HAVE_DLIB=1
@@ -299,6 +303,16 @@ fi
 AS_IF([ test "x${HAVE_DLIB}" = "x" && test "x${HAVE_NEWUOA}" = "x" ], [
 	AC_MSG_ERROR([Either libnewuoa-dev or libdlib-dev should be installed])
 ])
+
+dnl These are still needed outside the Debian environment
+AX_CHECK_LIBRARY([LIBZ], [zlib.h], [z],
+	[ LIBS="$LIBS -lz" ],
+	[AC_MSG_ERROR([libz not found - compressed files not supported])])
+AX_CHECK_LIBRARY([LIBBZ2], [bzlib.h], [bz2],
+	[ LIBS="$LIBS -lbz2"],
+	[AC_MSG_ERROR([libbz2 not found - compressed files not supported])])
+
+AC_SUBST([LIBS], [$LIBS])
 
 dnl Process Makefile.in to create Makefile
 AC_OUTPUT([GNUmakefile])

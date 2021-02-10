@@ -24,8 +24,17 @@
 /* Define to 1 if DLIB is found */
 #undef HAVE_DLIB
 
+/* Define to 1 if FFTW is found */
+#undef HAVE_FFTW
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
+
+/* Define to 1 if LIBBZ2 is found */
+#undef HAVE_LIBBZ2
+
+/* Define to 1 if LIBZ is found */
+#undef HAVE_LIBZ
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -41,6 +50,9 @@
 
 /* Have PTHREAD_PRIO_INHERIT. */
 #undef HAVE_PTHREAD_PRIO_INHERIT
+
+/* Define to 1 if RFFTW is found */
+#undef HAVE_RFFTW
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H

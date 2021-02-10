@@ -7410,8 +7410,8 @@ fi
 
 
 	else
-		ac_fn_cxx_check_header_mongrel "$LINENO" "cif++/Config.hpp" "ac_cv_header_cifpp_Config_hpp" "$ac_includes_default"
-if test "x$ac_cv_header_cifpp_Config_hpp" = xyes; then :
+		ac_fn_cxx_check_header_mongrel "$LINENO" "cif++/Cif++.hpp" "ac_cv_header_cifpp_Cifpp_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_cifpp_Cifpp_hpp" = xyes; then :
 
 
 else
@@ -7442,8 +7442,8 @@ fi
   LDFLAGS="$LDFLAGS $CIFPP_LDFLAGS"
 fi
 
-     ac_fn_cxx_check_header_mongrel "$LINENO" "cif++/Config.hpp" "ac_cv_header_cifpp_Config_hpp" "$ac_includes_default"
-if test "x$ac_cv_header_cifpp_Config_hpp" = xyes; then :
+     ac_fn_cxx_check_header_mongrel "$LINENO" "cif++/Cif++.hpp" "ac_cv_header_cifpp_Cifpp_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_cifpp_Cifpp_hpp" = xyes; then :
 
        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lcifpp" >&5
 $as_echo_n "checking for main in -lcifpp... " >&6; }

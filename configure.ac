@@ -297,6 +297,7 @@ pkg-config.])])
 	AX_CHECK_LIBRARY([NEWUOA], [newuoa.h], [newuoa],
 		[
 			LIBS="-lnewuoa $LIBS"
+			HAVE_NEWUOA=1
 		],
 		[AC_MSG_WARN([libnewuoa not found])])
 fi

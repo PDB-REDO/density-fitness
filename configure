@@ -637,10 +637,6 @@ DLIB_LIBS
 DLIB_CFLAGS
 DLIB_LDFLAGS
 DLIB_CPPFLAGS
-RFFTW_LDFLAGS
-RFFTW_CPPFLAGS
-FFTW_LDFLAGS
-FFTW_CPPFLAGS
 LIBPDB_REDO_DATA_DIR
 PDB_REDO_LDFLAGS
 PDB_REDO_CPPFLAGS
@@ -798,10 +794,6 @@ PDB_REDO_LIBS
 PDB_REDO_CPPFLAGS
 PDB_REDO_LDFLAGS
 LIBPDB_REDO_DATA_DIR
-FFTW_CPPFLAGS
-FFTW_LDFLAGS
-RFFTW_CPPFLAGS
-RFFTW_LDFLAGS
 DLIB_CPPFLAGS
 DLIB_LDFLAGS
 NEWUOA_CFLAGS
@@ -1530,14 +1522,6 @@ Some influential environment variables:
               linker flags for PDB_REDO libraries
   LIBPDB_REDO_DATA_DIR
               Directory containing bond-info.bin file
-  FFTW_CPPFLAGS
-              C preprocessor flags for FFTW headers
-  FFTW_LDFLAGS
-              linker flags for FFTW libraries
-  RFFTW_CPPFLAGS
-              C preprocessor flags for RFFTW headers
-  RFFTW_LDFLAGS
-              linker flags for RFFTW libraries
   DLIB_CPPFLAGS
               C preprocessor flags for DLIB headers
   DLIB_LDFLAGS
@@ -8333,164 +8317,6 @@ fi
 
 LIBPDB_REDO_DATA_DIR=$LIBPDB_REDO_DATA_DIR
 
-
-
-
-
-
-  if ${ax_cv_have_FFTW+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  save_CPPFLAGS="$CPPFLAGS"
-     save_LDFLAGS="$LDFLAGS"
-     save_LIBS="$LIBS"
-
-     if test "x$FFTW_CPPFLAGS" != "x"; then :
-  CPPFLAGS="$CPPFLAGS $FFTW_CPPFLAGS"
-fi
-
-     if test "x$FFTW_LDFLAGS" != "x"; then :
-  LDFLAGS="$LDFLAGS $FFTW_LDFLAGS"
-fi
-
-     ac_fn_cxx_check_header_mongrel "$LINENO" "fftw.h" "ac_cv_header_fftw_h" "$ac_includes_default"
-if test "x$ac_cv_header_fftw_h" = xyes; then :
-
-       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lfftw" >&5
-$as_echo_n "checking for main in -lfftw... " >&6; }
-if ${ac_cv_lib_fftw_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lfftw  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_fftw_main=yes
-else
-  ac_cv_lib_fftw_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw_main" >&5
-$as_echo "$ac_cv_lib_fftw_main" >&6; }
-if test "x$ac_cv_lib_fftw_main" = xyes; then :
-  ax_cv_have_FFTW=yes
-else
-  ax_cv_have_FFTW=no
-fi
-
-
-else
-  ax_cv_have_FFTW=no
-fi
-
-
-
-     CPPFLAGS="$save_CPPFLAGS"
-     LDFLAGS="$save_LDFLAGS"
-     LIBS="$save_LIBS"
-
-fi
-
-
-  if test "$ax_cv_have_FFTW" = "yes"; then :
-
-$as_echo "#define HAVE_FFTW 1" >>confdefs.h
-
-     LIBS="-lfftw $LIBS"
-fi
-
-
-
-
-
-  if ${ax_cv_have_RFFTW+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  save_CPPFLAGS="$CPPFLAGS"
-     save_LDFLAGS="$LDFLAGS"
-     save_LIBS="$LIBS"
-
-     if test "x$RFFTW_CPPFLAGS" != "x"; then :
-  CPPFLAGS="$CPPFLAGS $RFFTW_CPPFLAGS"
-fi
-
-     if test "x$RFFTW_LDFLAGS" != "x"; then :
-  LDFLAGS="$LDFLAGS $RFFTW_LDFLAGS"
-fi
-
-     ac_fn_cxx_check_header_mongrel "$LINENO" "rfftw.h" "ac_cv_header_rfftw_h" "$ac_includes_default"
-if test "x$ac_cv_header_rfftw_h" = xyes; then :
-
-       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lrfftw" >&5
-$as_echo_n "checking for main in -lrfftw... " >&6; }
-if ${ac_cv_lib_rfftw_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lrfftw  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_rfftw_main=yes
-else
-  ac_cv_lib_rfftw_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_rfftw_main" >&5
-$as_echo "$ac_cv_lib_rfftw_main" >&6; }
-if test "x$ac_cv_lib_rfftw_main" = xyes; then :
-  ax_cv_have_RFFTW=yes
-else
-  ax_cv_have_RFFTW=no
-fi
-
-
-else
-  ax_cv_have_RFFTW=no
-fi
-
-
-
-     CPPFLAGS="$save_CPPFLAGS"
-     LDFLAGS="$save_LDFLAGS"
-     LIBS="$save_LIBS"
-
-fi
-
-
-  if test "$ax_cv_have_RFFTW" = "yes"; then :
-
-$as_echo "#define HAVE_RFFTW 1" >>confdefs.h
-
-     LIBS="-lrfftw $LIBS"
-fi
 
 
 

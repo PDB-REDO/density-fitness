@@ -292,8 +292,8 @@ AC_ARG_VAR([LIBPDB_REDO_DATA_DIR], [Directory containing bond-info.bin file])
 AC_SUBST([LIBPDB_REDO_DATA_DIR], [$LIBPDB_REDO_DATA_DIR])
 
 dnl fftw libraries
-AX_CHECK_LIBRARY([FFTW], [fftw.h], [fftw], [ LIBS="-lfftw $LIBS" ])
-AX_CHECK_LIBRARY([RFFTW], [rfftw.h], [rfftw], [ LIBS="-lrfftw $LIBS" ])
+dnl AX_CHECK_LIBRARY([FFTW], [fftw.h], [fftw], [ LIBS="-lfftw $LIBS" ])
+dnl AX_CHECK_LIBRARY([RFFTW], [rfftw.h], [rfftw], [ LIBS="-lrfftw $LIBS" ])
 
 AX_CHECK_LIBRARY([DLIB], [dlib/global_optimization.h], [dlib],
 		[

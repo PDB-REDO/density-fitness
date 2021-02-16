@@ -18,7 +18,7 @@
 /* Define to 1 if CIFPP is found */
 #undef HAVE_CIFPP
 
-/* Use libclipper */
+/* Define to 1 if CLIPPER is found */
 #undef HAVE_CLIPPER
 
 /* define if the compiler supports basic C++17 syntax */

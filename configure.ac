@@ -174,6 +174,74 @@ pkg-config.])])
 	fi
 ])
 
+AC_ARG_VAR([CCP4], [The location where CCP4 is installed])
+
+AS_IF([test x"$CCP4" != x""],
+	[
+	CPPFLAGS="$CPPFLAGS -I ${CCP4}/include"
+	CXXFLAGS="$CXXFLAGS -I ${CCP4}/include"
+	LDFLAGS="$LDFLAGS -L${CCP4}/lib"
+
+	dnl since rpath is apparently something that is not ubiquitously available
+	AX_CHECK_LINK_FLAG([-Wl,-rpath=/tmp], [
+		LDFLAGS="$LDFLAGS -Wl,-rpath=${CCP4}/lib"])
+
+	AC_CHECK_HEADER(
+		[clipper/clipper.h],
+		[],
+		[AC_MSG_ERROR([
+Can't find the libclipper header, clipper/clipper.h.  Make sure that libclipper
+is installed, and either use the --with-clipper option or install
+pkg-config.])])
+
+	AX_CHECK_LIBRARY([CLIPPER], [clipper/clipper.h], [clipper-core],
+		[
+			CLIPPER_LIBS="-L${CCP4}/lib -lclipper-ccp4 -lclipper-cif -lclipper-minimol -lclipper-mmdb -lclipper-cns -lclipper-phs -lclipper-contrib -lclipper-core -lccp4c -lmmdb2 -lrfftw -lfftw"
+		],
+		[AC_MSG_ERROR([libclipper not found])])
+	])
+
+dnl Check for libclipper
+AC_ARG_WITH([clipper],
+	AS_HELP_STRING([--with-clipper=@<:@location@:>@],
+		[Use the libclipper library as specified.]),
+		[
+			AS_IF([test -d ${withval}], [], [
+				AC_MSG_ERROR(['${withval}'' is not a valid directory for --with-clipper])
+			])
+
+			CLIPPER_CFLAGS="-I ${withval}"
+			CLIPPER_LIBS="-L${withval}/lib -lclipper-ccp4 -lclipper-cif -lclipper-minimol -lclipper-mmdb -lclipper-cns -lclipper-phs -lclipper-contrib -lclipper-core -lccp4c -lmmdb2"
+
+			AC_SUBST([CLIPPER_CFLAGS], [$CLIPPER_CFLAGS])
+			AC_SUBST([CLIPPER_LIBS], [$CLIPPER_LIBS])
+		])
+
+AS_IF([test "x$CLIPPER_LIBS" = "x"], [
+	if test -x "$PKG_CONFIG"
+	then
+		AX_PKG_CHECK_MODULES([CLIPPER], [clipper], [], [], [AC_MSG_ERROR([the required package libclipper is not installed])])
+	else
+		AC_CHECK_HEADER(
+			[clipper/clipper.h],
+			[],
+			[AC_MSG_ERROR([
+Can't find the libclipper header, clipper/clipper.h.  Make sure that libclipper
+is installed, and either use the --with-clipper option or install
+pkg-config.])])
+
+		AX_CHECK_LIBRARY([CLIPPER], [clipper.h], [clipper-core],
+				[ LIBS="-lclipper-fortran -lclipper-ccp4 -lclipper-cif -lclipper-minimol -lclipper-mmdb -lclipper-cns -lclipper-phs -lclipper-contrib -lclipper-core -lccp4c -lmmdb2 $LIBS" ],
+				[AC_MSG_ERROR([libclipper not found])])
+	fi
+])
+
+AC_MSG_CHECKING([clipper version])
+AC_COMPILE_IFELSE(
+	[read_test(clipper-test.cpp)],
+	[AC_MSG_RESULT([ok])],
+	[AC_MSG_ERROR([The version of clipper is not up to date])])
+
 dnl Check for libpdb-redo
 
 AC_ARG_WITH([pdb-redo],
@@ -222,50 +290,6 @@ pkg-config.])])
 
 AC_ARG_VAR([LIBPDB_REDO_DATA_DIR], [Directory containing bond-info.bin file])
 AC_SUBST([LIBPDB_REDO_DATA_DIR], [$LIBPDB_REDO_DATA_DIR])
-
-dnl Check for libclipper
-
-AC_ARG_WITH([clipper],
-	AS_HELP_STRING([--with-clipper=@<:@location@:>@],
-		[Use the libclipper library as specified.]),
-		[
-			AS_IF([test -d ${withval}], [], [
-				AC_MSG_ERROR(['${withval}'' is not a valid directory for --with-clipper])
-			])
-
-			CLIPPER_CFLAGS="-I ${withval}"
-			CLIPPER_LIBS="-L${withval}/lib -lclipper-ccp4 -lclipper-cif -lclipper-minimol -lclipper-mmdb -lclipper-cns -lclipper-phs -lclipper-contrib -lclipper-core -lccp4c -lmmdb2"
-
-			AC_SUBST([CLIPPER_CFLAGS], [$CLIPPER_CFLAGS])
-			AC_SUBST([CLIPPER_LIBS], [$CLIPPER_LIBS])
-		])
-
-AS_IF([test "x$CLIPPER_LIBS" = "x"], [
-	if test -x "$PKG_CONFIG"
-	then
-		AX_PKG_CHECK_MODULES([CLIPPER], [clipper], [], [], [AC_MSG_ERROR([the required package libclipper is not installed])])
-	else
-		AC_CHECK_HEADER(
-			[clipper/clipper.h],
-			[],
-			[AC_MSG_ERROR([
-Can't find the libclipper header, clipper/clipper.h.  Make sure that libclipper
-is installed, and either use the --with-clipper option or install
-pkg-config.])])
-
-		AX_CHECK_LIBRARY([CLIPPER], [clipper.h], [clipper-core],
-				[ LIBS="-lclipper-fortran -lclipper-ccp4 -lclipper-cif -lclipper-minimol -lclipper-mmdb -lclipper-cns -lclipper-phs -lclipper-contrib -lclipper-core -lccp4c -lmmdb2 $LIBS" ],
-				[AC_MSG_ERROR([libclipper not found])])
-	fi
-])
-
-AC_MSG_CHECKING([clipper version])
-AC_COMPILE_IFELSE(
-	[read_test(clipper-test.cpp)],
-	[AC_MSG_RESULT([ok])],
-	[AC_MSG_ERROR([The version of clipper is not up to date])])
-
-AC_DEFINE([HAVE_CLIPPER], [1], [Use libclipper])
 
 dnl fftw libraries
 AX_CHECK_LIBRARY([FFTW], [fftw.h], [fftw], [ LIBS="-lfftw $LIBS" ])

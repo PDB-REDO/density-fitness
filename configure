@@ -641,15 +641,16 @@ RFFTW_LDFLAGS
 RFFTW_CPPFLAGS
 FFTW_LDFLAGS
 FFTW_CPPFLAGS
-CLIPPER_LDFLAGS
-CLIPPER_CPPFLAGS
-CLIPPER_LIBS
-CLIPPER_CFLAGS
 LIBPDB_REDO_DATA_DIR
 PDB_REDO_LDFLAGS
 PDB_REDO_CPPFLAGS
 PDB_REDO_LIBS
 PDB_REDO_CFLAGS
+CLIPPER_LIBS
+CLIPPER_CFLAGS
+CLIPPER_LDFLAGS
+CLIPPER_CPPFLAGS
+CCP4
 ZEEP_LDFLAGS
 ZEEP_CPPFLAGS
 ZEEP_LIBS
@@ -757,8 +758,8 @@ with_boost_date_time
 with_boost_regex
 with_cif__
 with_zeep
-with_pdb_redo
 with_clipper
+with_pdb_redo
 '
       ac_precious_vars='build_alias
 host_alias
@@ -787,15 +788,16 @@ ZEEP_CFLAGS
 ZEEP_LIBS
 ZEEP_CPPFLAGS
 ZEEP_LDFLAGS
+CCP4
+CLIPPER_CPPFLAGS
+CLIPPER_LDFLAGS
+CLIPPER_CFLAGS
+CLIPPER_LIBS
 PDB_REDO_CFLAGS
 PDB_REDO_LIBS
 PDB_REDO_CPPFLAGS
 PDB_REDO_LDFLAGS
 LIBPDB_REDO_DATA_DIR
-CLIPPER_CFLAGS
-CLIPPER_LIBS
-CLIPPER_CPPFLAGS
-CLIPPER_LDFLAGS
 FFTW_CPPFLAGS
 FFTW_LDFLAGS
 RFFTW_CPPFLAGS
@@ -1470,10 +1472,10 @@ Optional Packages:
                           --with-boost-regex=boost_regex-gcc-mt-d-1_33_1
   --with-cif++=[location] Use the cif++ library as specified.
   --with-zeep=[location]  Use the libzeep library as specified.
-  --with-pdb-redo=[location]
-                          Use the pdb-redo library as specified.
   --with-clipper=[location]
                           Use the libclipper library as specified.
+  --with-pdb-redo=[location]
+                          Use the pdb-redo library as specified.
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -1509,6 +1511,15 @@ Some influential environment variables:
               C preprocessor flags for ZEEP headers
   ZEEP_LDFLAGS
               linker flags for ZEEP libraries
+  CCP4        The location where CCP4 is installed
+  CLIPPER_CPPFLAGS
+              C preprocessor flags for CLIPPER headers
+  CLIPPER_LDFLAGS
+              linker flags for CLIPPER libraries
+  CLIPPER_CFLAGS
+              C compiler flags for CLIPPER, overriding pkg-config
+  CLIPPER_LIBS
+              linker flags for CLIPPER, overriding pkg-config
   PDB_REDO_CFLAGS
               C compiler flags for PDB_REDO, overriding pkg-config
   PDB_REDO_LIBS
@@ -1519,14 +1530,6 @@ Some influential environment variables:
               linker flags for PDB_REDO libraries
   LIBPDB_REDO_DATA_DIR
               Directory containing bond-info.bin file
-  CLIPPER_CFLAGS
-              C compiler flags for CLIPPER, overriding pkg-config
-  CLIPPER_LIBS
-              linker flags for CLIPPER, overriding pkg-config
-  CLIPPER_CPPFLAGS
-              C preprocessor flags for CLIPPER headers
-  CLIPPER_LDFLAGS
-              linker flags for CLIPPER libraries
   FFTW_CPPFLAGS
               C preprocessor flags for FFTW headers
   FFTW_LDFLAGS
@@ -7729,125 +7732,57 @@ fi
 
 
 
-# Check whether --with-pdb-redo was given.
-if test "${with_pdb_redo+set}" = set; then :
-  withval=$with_pdb_redo;
-			if test -d ${withval}/include; then :
+if test x"$CCP4" != x""; then :
 
+	CPPFLAGS="$CPPFLAGS -I ${CCP4}/include"
+	CXXFLAGS="$CXXFLAGS -I ${CCP4}/include"
+	LDFLAGS="$LDFLAGS -L${CCP4}/lib"
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -Wl,-rpath=/tmp" >&5
+$as_echo_n "checking whether the linker accepts -Wl,-rpath=/tmp... " >&6; }
+if ${ax_cv_check_ldflags___Wl__rpath__tmp+:} false; then :
+  $as_echo_n "(cached) " >&6
 else
 
-				as_fn_error $? "'${withval}'' is not a valid directory for --with-pdb-redo" "$LINENO" 5
+  ax_check_save_flags=$LDFLAGS
+  LDFLAGS="$LDFLAGS  -Wl,-rpath=/tmp"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
-fi
+int
+main ()
+{
 
-			PDB_REDO_CFLAGS="-I ${withval}/include"
-			PDB_REDO_LIBS="-L${withval}/.libs -lpdb-redo"
-			LIBPDB_REDO_DATA_DIR="${withval}/rsrc"
-
-			PDB_REDO_CFLAGS=$PDB_REDO_CFLAGS
-
-			PDB_REDO_LIBS=$PDB_REDO_LIBS
-
-
-fi
-
-
-if test "x$PDB_REDO_LIBS" = "x"; then :
-
-	if test -x "$PKG_CONFIG"
-	then
-
-
-
-
-    AX_PACKAGE_REQUIRES="$AX_PACKAGE_REQUIRES libpdb-redo"
-    AX_PACKAGE_REQUIRES_PRIVATE="$AX_PACKAGE_REQUIRES_PRIVATE "
-
-
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PDB_REDO" >&5
-$as_echo_n "checking for PDB_REDO... " >&6; }
-
-if test -n "$PDB_REDO_CFLAGS"; then
-    pkg_cv_PDB_REDO_CFLAGS="$PDB_REDO_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libpdb-redo \""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libpdb-redo ") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_PDB_REDO_CFLAGS=`$PKG_CONFIG --cflags "libpdb-redo " 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ax_cv_check_ldflags___Wl__rpath__tmp=yes
 else
-  pkg_failed=yes
+  ax_cv_check_ldflags___Wl__rpath__tmp=no
 fi
- else
-    pkg_failed=untried
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+  LDFLAGS=$ax_check_save_flags
 fi
-if test -n "$PDB_REDO_LIBS"; then
-    pkg_cv_PDB_REDO_LIBS="$PDB_REDO_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libpdb-redo \""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libpdb-redo ") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_PDB_REDO_LIBS=`$PKG_CONFIG --libs "libpdb-redo " 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_ldflags___Wl__rpath__tmp" >&5
+$as_echo "$ax_cv_check_ldflags___Wl__rpath__tmp" >&6; }
+if test "x$ax_cv_check_ldflags___Wl__rpath__tmp" = xyes; then :
+
+		LDFLAGS="$LDFLAGS -Wl,-rpath=${CCP4}/lib"
 else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
+  :
 fi
 
 
-
-if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        PDB_REDO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libpdb-redo " 2>&1`
-        else
-	        PDB_REDO_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libpdb-redo " 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$PDB_REDO_PKG_ERRORS" >&5
-
-	as_fn_error $? "the required package libpdb-redo is not installed" "$LINENO" 5
-elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-	as_fn_error $? "the required package libpdb-redo is not installed" "$LINENO" 5
-else
-	PDB_REDO_CFLAGS=$pkg_cv_PDB_REDO_CFLAGS
-	PDB_REDO_LIBS=$pkg_cv_PDB_REDO_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-fi
-
-    # Substitute output.
-
-
-
-	else
-		ac_fn_cxx_check_header_mongrel "$LINENO" "pdb-redo/Config.hpp" "ac_cv_header_pdb_redo_Config_hpp" "$ac_includes_default"
-if test "x$ac_cv_header_pdb_redo_Config_hpp" = xyes; then :
-
+	ac_fn_cxx_check_header_mongrel "$LINENO" "clipper/clipper.h" "ac_cv_header_clipper_clipper_h" "$ac_includes_default"
+if test "x$ac_cv_header_clipper_clipper_h" = xyes; then :
 
 else
   as_fn_error $? "
-Can't find the libpdb-redo header, Config.hpp.  Make sure that it
-is installed, and either use the --with-pdb-redo option or install
+Can't find the libclipper header, clipper/clipper.h.  Make sure that libclipper
+is installed, and either use the --with-clipper option or install
 pkg-config." "$LINENO" 5
 fi
 
@@ -7857,31 +7792,31 @@ fi
 
 
 
-  if ${ax_cv_have_PDB_REDO+:} false; then :
+  if ${ax_cv_have_CLIPPER+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   save_CPPFLAGS="$CPPFLAGS"
      save_LDFLAGS="$LDFLAGS"
      save_LIBS="$LIBS"
 
-     if test "x$PDB_REDO_CPPFLAGS" != "x"; then :
-  CPPFLAGS="$CPPFLAGS $PDB_REDO_CPPFLAGS"
+     if test "x$CLIPPER_CPPFLAGS" != "x"; then :
+  CPPFLAGS="$CPPFLAGS $CLIPPER_CPPFLAGS"
 fi
 
-     if test "x$PDB_REDO_LDFLAGS" != "x"; then :
-  LDFLAGS="$LDFLAGS $PDB_REDO_LDFLAGS"
+     if test "x$CLIPPER_LDFLAGS" != "x"; then :
+  LDFLAGS="$LDFLAGS $CLIPPER_LDFLAGS"
 fi
 
-     ac_fn_cxx_check_header_mongrel "$LINENO" "pdb-redo/Config.hpp" "ac_cv_header_pdb_redo_Config_hpp" "$ac_includes_default"
-if test "x$ac_cv_header_pdb_redo_Config_hpp" = xyes; then :
+     ac_fn_cxx_check_header_mongrel "$LINENO" "clipper/clipper.h" "ac_cv_header_clipper_clipper_h" "$ac_includes_default"
+if test "x$ac_cv_header_clipper_clipper_h" = xyes; then :
 
-       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpdb-redo" >&5
-$as_echo_n "checking for main in -lpdb-redo... " >&6; }
-if ${ac_cv_lib_pdb_redo_main+:} false; then :
+       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lclipper-core" >&5
+$as_echo_n "checking for main in -lclipper-core... " >&6; }
+if ${ac_cv_lib_clipper_core_main+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpdb-redo  $LIBS"
+LIBS="-lclipper-core  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -7895,25 +7830,25 @@ return main ();
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_pdb_redo_main=yes
+  ac_cv_lib_clipper_core_main=yes
 else
-  ac_cv_lib_pdb_redo_main=no
+  ac_cv_lib_clipper_core_main=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pdb_redo_main" >&5
-$as_echo "$ac_cv_lib_pdb_redo_main" >&6; }
-if test "x$ac_cv_lib_pdb_redo_main" = xyes; then :
-  ax_cv_have_PDB_REDO=yes
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_clipper_core_main" >&5
+$as_echo "$ac_cv_lib_clipper_core_main" >&6; }
+if test "x$ac_cv_lib_clipper_core_main" = xyes; then :
+  ax_cv_have_CLIPPER=yes
 else
-  ax_cv_have_PDB_REDO=no
+  ax_cv_have_CLIPPER=no
 fi
 
 
 else
-  ax_cv_have_PDB_REDO=no
+  ax_cv_have_CLIPPER=no
 fi
 
 
@@ -7925,32 +7860,19 @@ fi
 fi
 
 
-  if test "$ax_cv_have_PDB_REDO" = "yes"; then :
+  if test "$ax_cv_have_CLIPPER" = "yes"; then :
 
-$as_echo "#define HAVE_PDB_REDO 1" >>confdefs.h
+$as_echo "#define HAVE_CLIPPER 1" >>confdefs.h
 
 
-				LIBS="-lpdb-redo $LIBS"
+			CLIPPER_LIBS="-L${CCP4}/lib -lclipper-ccp4 -lclipper-cif -lclipper-minimol -lclipper-mmdb -lclipper-cns -lclipper-phs -lclipper-contrib -lclipper-core -lccp4c -lmmdb2 -lrfftw -lfftw"
 
 else
-  as_fn_error $? "libpdb-redo not found" "$LINENO" 5
-fi
-
-	fi
-
-	if  test -f /usr/share/libpdb-redo/bond-info.bin ; then :
-  LIBPDB_REDO_DATA_DIR=/usr/share/libpdb-redo
-fi
-	if  test -f /usr/local/share/libpdb-redo/bond-info.bin ; then :
-  LIBPDB_REDO_DATA_DIR=/usr/local/share/libpdb-redo
-fi
-
+  as_fn_error $? "libclipper not found" "$LINENO" 5
 fi
 
 
-LIBPDB_REDO_DATA_DIR=$LIBPDB_REDO_DATA_DIR
-
-
+fi
 
 
 # Check whether --with-clipper was given.
@@ -8189,7 +8111,227 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-$as_echo "#define HAVE_CLIPPER 1" >>confdefs.h
+
+# Check whether --with-pdb-redo was given.
+if test "${with_pdb_redo+set}" = set; then :
+  withval=$with_pdb_redo;
+			if test -d ${withval}/include; then :
+
+else
+
+				as_fn_error $? "'${withval}'' is not a valid directory for --with-pdb-redo" "$LINENO" 5
+
+fi
+
+			PDB_REDO_CFLAGS="-I ${withval}/include"
+			PDB_REDO_LIBS="-L${withval}/.libs -lpdb-redo"
+			LIBPDB_REDO_DATA_DIR="${withval}/rsrc"
+
+			PDB_REDO_CFLAGS=$PDB_REDO_CFLAGS
+
+			PDB_REDO_LIBS=$PDB_REDO_LIBS
+
+
+fi
+
+
+if test "x$PDB_REDO_LIBS" = "x"; then :
+
+	if test -x "$PKG_CONFIG"
+	then
+
+
+
+
+    AX_PACKAGE_REQUIRES="$AX_PACKAGE_REQUIRES libpdb-redo"
+    AX_PACKAGE_REQUIRES_PRIVATE="$AX_PACKAGE_REQUIRES_PRIVATE "
+
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PDB_REDO" >&5
+$as_echo_n "checking for PDB_REDO... " >&6; }
+
+if test -n "$PDB_REDO_CFLAGS"; then
+    pkg_cv_PDB_REDO_CFLAGS="$PDB_REDO_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libpdb-redo \""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libpdb-redo ") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_PDB_REDO_CFLAGS=`$PKG_CONFIG --cflags "libpdb-redo " 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$PDB_REDO_LIBS"; then
+    pkg_cv_PDB_REDO_LIBS="$PDB_REDO_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libpdb-redo \""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libpdb-redo ") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_PDB_REDO_LIBS=`$PKG_CONFIG --libs "libpdb-redo " 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        PDB_REDO_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libpdb-redo " 2>&1`
+        else
+	        PDB_REDO_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libpdb-redo " 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$PDB_REDO_PKG_ERRORS" >&5
+
+	as_fn_error $? "the required package libpdb-redo is not installed" "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	as_fn_error $? "the required package libpdb-redo is not installed" "$LINENO" 5
+else
+	PDB_REDO_CFLAGS=$pkg_cv_PDB_REDO_CFLAGS
+	PDB_REDO_LIBS=$pkg_cv_PDB_REDO_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+    # Substitute output.
+
+
+
+	else
+		ac_fn_cxx_check_header_mongrel "$LINENO" "pdb-redo/Config.hpp" "ac_cv_header_pdb_redo_Config_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_pdb_redo_Config_hpp" = xyes; then :
+
+
+else
+  as_fn_error $? "
+Can't find the libpdb-redo header, Config.hpp.  Make sure that it
+is installed, and either use the --with-pdb-redo option or install
+pkg-config." "$LINENO" 5
+fi
+
+
+
+
+
+
+
+  if ${ax_cv_have_PDB_REDO+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  save_CPPFLAGS="$CPPFLAGS"
+     save_LDFLAGS="$LDFLAGS"
+     save_LIBS="$LIBS"
+
+     if test "x$PDB_REDO_CPPFLAGS" != "x"; then :
+  CPPFLAGS="$CPPFLAGS $PDB_REDO_CPPFLAGS"
+fi
+
+     if test "x$PDB_REDO_LDFLAGS" != "x"; then :
+  LDFLAGS="$LDFLAGS $PDB_REDO_LDFLAGS"
+fi
+
+     ac_fn_cxx_check_header_mongrel "$LINENO" "pdb-redo/Config.hpp" "ac_cv_header_pdb_redo_Config_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_pdb_redo_Config_hpp" = xyes; then :
+
+       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpdb-redo" >&5
+$as_echo_n "checking for main in -lpdb-redo... " >&6; }
+if ${ac_cv_lib_pdb_redo_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpdb-redo  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_pdb_redo_main=yes
+else
+  ac_cv_lib_pdb_redo_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pdb_redo_main" >&5
+$as_echo "$ac_cv_lib_pdb_redo_main" >&6; }
+if test "x$ac_cv_lib_pdb_redo_main" = xyes; then :
+  ax_cv_have_PDB_REDO=yes
+else
+  ax_cv_have_PDB_REDO=no
+fi
+
+
+else
+  ax_cv_have_PDB_REDO=no
+fi
+
+
+
+     CPPFLAGS="$save_CPPFLAGS"
+     LDFLAGS="$save_LDFLAGS"
+     LIBS="$save_LIBS"
+
+fi
+
+
+  if test "$ax_cv_have_PDB_REDO" = "yes"; then :
+
+$as_echo "#define HAVE_PDB_REDO 1" >>confdefs.h
+
+
+				LIBS="-lpdb-redo $LIBS"
+
+else
+  as_fn_error $? "libpdb-redo not found" "$LINENO" 5
+fi
+
+	fi
+
+	if  test -f /usr/share/libpdb-redo/bond-info.bin ; then :
+  LIBPDB_REDO_DATA_DIR=/usr/share/libpdb-redo
+fi
+	if  test -f /usr/local/share/libpdb-redo/bond-info.bin ; then :
+  LIBPDB_REDO_DATA_DIR=/usr/local/share/libpdb-redo
+fi
+
+fi
+
+
+LIBPDB_REDO_DATA_DIR=$LIBPDB_REDO_DATA_DIR
 
 
 

@@ -150,13 +150,13 @@ rsrc:
 	@ mkdir -p $@
 
 rsrc/%.dic: $(LIBCIFPP_DATA_DIR)/%.dic.gz | rsrc
-	gzcat $^ > $@
+	zcat $^ > $@
 
 rsrc/%.dic: $(LIBCIFPP_DATA_DIR)/%.dic | rsrc
 	ln -fs $^ $@
 
-rsrc/bond-info.bin: $(LIBPDB_REDO_DATA_DIR)/bond-info.bin.gz | rsrc
-	ln -s $^ $@
+rsrc/bond-info.bin: $(LIBPDB_REDO_DATA_DIR)/bond-info.bin | rsrc
+	ln -fs $^ $@
 
 $(OBJDIR)/$(PROGRAM)_rsrc.o: rsrc/bond-info.bin rsrc/mmcif_pdbx_v50.dic
 	$(MRC) -o $@ $^

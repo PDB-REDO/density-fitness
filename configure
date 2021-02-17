@@ -7396,6 +7396,7 @@ fi
 
 
 
+		LIBCIFPP_DATA_DIR=$(pkg-config --variable=datalibdir libcifpp)
 	else
 		ac_fn_cxx_check_header_mongrel "$LINENO" "cif++/Cif++.hpp" "ac_cv_header_cifpp_Cifpp_hpp" "$ac_includes_default"
 if test "x$ac_cv_header_cifpp_Cifpp_hpp" = xyes; then :
@@ -7493,11 +7494,13 @@ else
   as_fn_error $? "libcif++ not found" "$LINENO" 5
 fi
 
-	fi
-
-	if  test -f /var/cache/libcifpp/mmcif_pdbx_v50.dic ; then :
+		if  test -f /usr/local/share/libcifpp/mmcif_pdbx_v50.dic.gz ; then :
+  LIBCIFPP_DATA_DIR=/usr/local/share/libcifpp/
+fi
+		if  test -f /var/cache/libcifpp/mmcif_pdbx_v50.dic.gz ; then :
   LIBCIFPP_DATA_DIR=/var/cache/libcifpp
 fi
+	fi
 
 fi
 
@@ -8206,6 +8209,7 @@ fi
 
 
 
+		LIBPDB_REDO_DATA_DIR=$(pkg-config --variable=datalibdir libpdb-redo)
 	else
 		ac_fn_cxx_check_header_mongrel "$LINENO" "pdb-redo/Config.hpp" "ac_cv_header_pdb_redo_Config_hpp" "$ac_includes_default"
 if test "x$ac_cv_header_pdb_redo_Config_hpp" = xyes; then :
@@ -8303,14 +8307,13 @@ else
   as_fn_error $? "libpdb-redo not found" "$LINENO" 5
 fi
 
-	fi
-
-	if  test -f /usr/share/libpdb-redo/bond-info.bin ; then :
+		if  test -f /usr/share/libpdb-redo/bond-info.bin ; then :
   LIBPDB_REDO_DATA_DIR=/usr/share/libpdb-redo
 fi
-	if  test -f /usr/local/share/libpdb-redo/bond-info.bin ; then :
+		if  test -f /usr/local/share/libpdb-redo/bond-info.bin ; then :
   LIBPDB_REDO_DATA_DIR=/usr/local/share/libpdb-redo
 fi
+	fi
 
 fi
 

@@ -38,7 +38,7 @@ if test "x$MRC" = "x"; then
 else
 	AC_ARG_ENABLE(
 		resources,
-		[AS_HELP_STRING([--disable-resources], [Use mrc to store data in resources])])
+		[AS_HELP_STRING([--disable-resources], [Do not use mrc to store data in resources])])
 
 	AS_IF([test "x$enable_resources" != "xno" ], [
 		USE_RSRC=1
@@ -114,6 +114,7 @@ AS_IF([test "x$CIFPP_LIBS" = "x"], [
 	if test -x "$PKG_CONFIG"
 	then
 		AX_PKG_CHECK_MODULES([CIFPP], [libcifpp], [], [], [AC_MSG_ERROR([the required package libcif++ is not installed])])
+		LIBCIFPP_DATA_DIR=$(pkg-config --variable=datalibdir libcifpp)
 	else
 		AC_CHECK_HEADER(
 	        [cif++/Cif++.hpp],
@@ -130,9 +131,9 @@ pkg-config.])])
 				LIBS="-lcifpp $LIBS"
 			],
 			[AC_MSG_ERROR([libcif++ not found])])
+		AS_IF([ test -f /usr/local/share/libcifpp/mmcif_pdbx_v50.dic.gz ], [LIBCIFPP_DATA_DIR=/usr/local/share/libcifpp/ ])
+		AS_IF([ test -f /var/cache/libcifpp/mmcif_pdbx_v50.dic.gz ], [LIBCIFPP_DATA_DIR=/var/cache/libcifpp ])
 	fi
-
-	AS_IF([ test -f /var/cache/libcifpp/mmcif_pdbx_v50.dic ], [LIBCIFPP_DATA_DIR=/var/cache/libcifpp ])
 ])
 
 AC_ARG_VAR([LIBCIFPP_DATA_DIR], [Directory containing mmcif_pdbx_v50.dic file])
@@ -266,6 +267,7 @@ AS_IF([test "x$PDB_REDO_LIBS" = "x"], [
 	if test -x "$PKG_CONFIG"
 	then
 		AX_PKG_CHECK_MODULES([PDB_REDO], [libpdb-redo], [], [], [AC_MSG_ERROR([the required package libpdb-redo is not installed])])
+		LIBPDB_REDO_DATA_DIR=$(pkg-config --variable=datalibdir libpdb-redo)
 	else
 		AC_CHECK_HEADER(
 	        [pdb-redo/Config.hpp],
@@ -282,10 +284,9 @@ pkg-config.])])
 				LIBS="-lpdb-redo $LIBS"
 			],
 			[AC_MSG_ERROR([libpdb-redo not found])])
+		AS_IF([ test -f /usr/share/libpdb-redo/bond-info.bin ], [LIBPDB_REDO_DATA_DIR=/usr/share/libpdb-redo])
+		AS_IF([ test -f /usr/local/share/libpdb-redo/bond-info.bin ], [LIBPDB_REDO_DATA_DIR=/usr/local/share/libpdb-redo])
 	fi
-
-	AS_IF([ test -f /usr/share/libpdb-redo/bond-info.bin ], [LIBPDB_REDO_DATA_DIR=/usr/share/libpdb-redo])
-	AS_IF([ test -f /usr/local/share/libpdb-redo/bond-info.bin ], [LIBPDB_REDO_DATA_DIR=/usr/local/share/libpdb-redo])
 ])
 
 AC_ARG_VAR([LIBPDB_REDO_DATA_DIR], [Directory containing bond-info.bin file])

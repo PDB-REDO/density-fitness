@@ -1,6 +1,12 @@
 AC_PREREQ([2.69])
 
-AC_INIT([density-fitness], 2.0, [m.hekkelman@nki.nl])
+m4_define([density_fitness_version_major],[2])
+m4_define([density_fitness_version_minor],[0])
+m4_define([density_fitness_version_micro],[1])
+m4_define([density_fitness_version_extra],[])
+m4_define([density_fitness_version],[density_fitness_version_major().density_fitness_version_minor().density_fitness_version_micro()density_fitness_version_extra])
+
+AC_INIT([density-fitness], [density_fitness_version], [m.hekkelman@nki.nl])
 
 dnl Switch to a decent C++ compiler, and check if it works.
 AC_LANG(C++)

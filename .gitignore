@@ -11,3 +11,4 @@ aclocal.m4
 src/config.hpp
 src/revision.hpp
 src/config.hpp.in~
+.gdb_history

@@ -23,6 +23,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 firstTarget: all
+empty =
+space = $(empty) $(empty)
 
 CXX					= @CXX@
 CXXFLAGS			= @BOOST_CPPFLAGS@ \
@@ -32,11 +34,13 @@ CXXFLAGS			= @BOOST_CPPFLAGS@ \
 					  @CIFPP_CFLAGS@ \
 					  @ZEEP_CFLAGS@ \
 					  @PDB_REDO_CFLAGS@ \
-					  @CLIPPER_CFLAGS@
+					  @CLIPPER_CFLAGS@ \
+					  @NEWUOA_CFLAGS@ @DLIB_CFLAGS@
 LDFLAGS				= @BOOST_LDFLAGS@ \
 					  @LDFLAGS@ \
 					  @PTHREAD_CFLAGS@
-LIBS				= @CIFPP_LIBS@ \
+LIBS				= @PTHREAD_LIBS@ \
+					  @CIFPP_LIBS@ \
 					  @ZEEP_LIBS@ \
 					  @PDB_REDO_LIBS@ \
 					  @CLIPPER_LIBS@ \
@@ -44,10 +48,10 @@ LIBS				= @CIFPP_LIBS@ \
 					  @BOOST_IOSTREAMS_LIB@ \
 					  @BOOST_DATE_TIME_LIB@ \
 					  @BOOST_REGEX_LIB@ \
-					  @DLIB_LIBS@ @NEWUOA_LIBS@ \
+					  @NEWUOA_LIBS@ @DLIB_LIBS@ \
 					  @LIBS@
 
-prefix				= @prefix@
+prefix				= $(DESTDIR)@prefix@
 exec_prefix			= @exec_prefix@
 bindir				= @bindir@
 datarootdir			= @datarootdir@
@@ -57,28 +61,19 @@ mandir				= @mandir@
 GNUmakefile: config.status GNUmakefile.in
 	$(SHELL) ./config.status
 
-ifneq "$(CHECK_CONFIG)" ""
-
-config.status: configure
-	$(SHELL) ./config.status --recheck
-
-configure: configure.ac
-	autoconf
-
-endif
-
 # main build variables
 PROGRAM				= @PACKAGE_NAME@
-VERSION				= @PACKAGE_VERSION@.0
-DEFINES				+= VERSION='"$(VERSION)"'
 
-CXXFLAGS            += -Wall -Wno-multichar
+VERSION				= @PACKAGE_VERSION@
 
-LIBCIFPP_DATA_DIR	= @LIBCIFPP_DATA_DIR@
-LIBPDB_REDO_DATA_DIR= @LIBPDB_REDO_DATA_DIR@
+SEARCH_PATHS		= src test @LIBCIFPP_DATA_DIR@ @LIBPDB_REDO_DATA_DIR@
+
+OBJECTS				= $(PROGRAM).o
+
+RESOURCES			= bond-info.bin mmcif_pdbx_v50.dic
 
 # Use the DEBUG flag to build debug versions of the code
-DEBUG               = @DEBUG@
+DEBUG				= @DEBUG@
 
 ifeq "$(DEBUG)" "1"
 DEFINES				+= DEBUG
@@ -92,10 +87,9 @@ endif
 MRC					= @MRC@
 USE_RSRC			= @USE_RSRC@
 
-# targets
+VPATH += $(subst $(space),:,$(SEARCH_PATHS))
 
-VPATH += src:test
-
+CXXFLAGS            += -Wall -Wno-multichar
 CXXFLAGS			+= $(DEFINES:%=-D%)
 
 OBJDIR = obj
@@ -139,42 +133,24 @@ src/revision.hpp:
 
 endif
 
-ifneq "$(USE_RSRC)" "0"
-
-rsrc/version.txt: $(REVISION_FILE)
-	cp $? $@
-
-endif
-
 # The program rules
 
-OBJECTS = \
-	$(OBJDIR)/$(PROGRAM).o
-
 ifneq "$(USE_RSRC)" "0"
 
-OBJECTS += $(OBJDIR)/$(PROGRAM)_rsrc.o
+OBJECTS += $(PROGRAM)_rsrc.o
 
-rsrc:
-	@ mkdir -p $@
-
-rsrc/%.dic: $(LIBCIFPP_DATA_DIR)/%.dic.gz | rsrc
+# dictionaries may be found compressed
+%.dic: %.dic.gz
 	gunzip -c $^ > $@
 
-rsrc/%.dic: $(LIBCIFPP_DATA_DIR)/%.dic | rsrc
-	ln -fs $(realpath $^) $@
-
-rsrc/bond-info.bin: $(LIBPDB_REDO_DATA_DIR)/bond-info.bin | rsrc
-	ln -fs $(realpath $^) $@
-
-$(OBJDIR)/$(PROGRAM)_rsrc.o: rsrc/bond-info.bin rsrc/mmcif_pdbx_v50.dic
+$(OBJDIR)/$(PROGRAM)_rsrc.o: $(RESOURCES)
 	$(MRC) -o $@ $^
 
 endif
 
 $(OBJDIR)/$(PROGRAM).o: src/revision.hpp
 
-$(PROGRAM): $(OBJECTS)
+$(PROGRAM): $(OBJECTS:%.o=$(OBJDIR)/%.o)
 	@ echo '->' $@
 	@ $(CXX) -o $@ $^ $(CXXFLAGS) $(LDFLAGS) $(LIBS)
 

@@ -27,16 +27,20 @@ empty =
 space = $(empty) $(empty)
 
 CXX					= @CXX@
-CXXFLAGS			= @CXXFLAGS@ \
+CXXFLAGS			= @BOOST_CPPFLAGS@ \
+					  @CXXFLAGS@ \
 					  @CPPFLAGS@ \
 					  @PTHREAD_CFLAGS@ \
 					  @CIFPP_CFLAGS@ \
 					  @ZEEP_CFLAGS@ \
 					  @PDB_REDO_CFLAGS@ \
-					  @CLIPPER_CFLAGS@
-LDFLAGS				= @LDFLAGS@ \
+					  @CLIPPER_CFLAGS@ \
+					  @NEWUOA_CFLAGS@ @DLIB_CFLAGS@
+LDFLAGS				= @BOOST_LDFLAGS@ \
+					  @LDFLAGS@ \
 					  @PTHREAD_CFLAGS@
-LIBS				= @CIFPP_LIBS@ \
+LIBS				= @PTHREAD_LIBS@ \
+					  @CIFPP_LIBS@ \
 					  @ZEEP_LIBS@ \
 					  @PDB_REDO_LIBS@ \
 					  @CLIPPER_LIBS@ \
@@ -44,7 +48,7 @@ LIBS				= @CIFPP_LIBS@ \
 					  @BOOST_IOSTREAMS_LIB@ \
 					  @BOOST_DATE_TIME_LIB@ \
 					  @BOOST_REGEX_LIB@ \
-					  @DLIB_LIBS@ @NEWUOA_LIBS@ \
+					  @NEWUOA_LIBS@ @DLIB_LIBS@ \
 					  @LIBS@
 
 prefix				= $(DESTDIR)@prefix@
@@ -134,6 +138,10 @@ endif
 ifneq "$(USE_RSRC)" "0"
 
 OBJECTS += $(PROGRAM)_rsrc.o
+
+# dictionaries may be found compressed
+%.dic: %.dic.gz
+	gunzip -c $^ > $@
 
 $(OBJDIR)/$(PROGRAM)_rsrc.o: $(RESOURCES)
 	$(MRC) -o $@ $^

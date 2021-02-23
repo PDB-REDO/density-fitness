@@ -7623,14 +7623,40 @@ fi
 
 
 		else
+
+
+			case ${host_cpu} in #(
+  x86_64) :
+    libsubdirs="lib64 libx32 lib lib64" ;; #(
+  ppc64|powerpc64|s390x|sparc64|aarch64|ppc64le|powerpc64le|riscv64) :
+    libsubdirs="lib64 lib lib64" ;; #(
+  *) :
+    libsubdirs="lib"
+			 ;;
+esac
+
+			for _AX_ZEEP_path in /usr /usr/local /opt /opt/local ; do
+				if test -d "$_AX_ZEEP_path/include/zeep" && test -r "$_AX_ZEEP_path/include/zeep" ; then
+
+					for libsubdir in $search_libsubdirs ; do
+						if ls "$_AX_ZEEP_path/$libsubdir/libzeep"* >/dev/null 2>&1 ; then break; fi
+					done
+					ZEEP_LDFLAGS="-L$_AX_ZEEP_path/$libsubdir"
+					ZEEP_CFLAGS="-I$_AX_ZEEP_path/include"
+					break;
+				fi
+			done
+
+			save_LDFLAGS=$LDFLAGS; LDFLAGS="$LDFLAGS $ZEEP_LDFLAGS"
+			save_CPPFLAGS=$CPPFLAGS; CPPFLAGS="$CPPFLAGS $ZEEP_CFLAGS"
+
 			ac_fn_cxx_check_header_mongrel "$LINENO" "zeep/json/element.hpp" "ac_cv_header_zeep_json_element_hpp" "$ac_includes_default"
 if test "x$ac_cv_header_zeep_json_element_hpp" = xyes; then :
 
 else
   as_fn_error $? "
-	Can't find the libzeep header, zeep/json/element.hpp.  Make sure that libzeep
-	is installed, and either use the --with-zeep option or install
-	pkg-config." "$LINENO" 5
+Can't find the libzeep header, zeep/json/element.hpp. Make sure that libzeep
+is installed, and either use the --with-zeep option or install pkg-config." "$LINENO" 5
 fi
 
 
@@ -7716,6 +7742,9 @@ else
   as_fn_error $? "libzeep not found" "$LINENO" 5
 fi
 
+
+			LDFLAGS=$save_LDFLAGS
+			CPPFLAGS=$save_CPPFLAGS
 		fi
 
 fi

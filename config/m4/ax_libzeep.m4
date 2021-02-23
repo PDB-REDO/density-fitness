@@ -48,17 +48,42 @@ AC_DEFUN([AX_LIBZEEP],
 		then
 			AX_PKG_CHECK_MODULES([ZEEP], [libzeep], [], [], [AC_MSG_ERROR([the required package libzeep is not installed])])
 		else
+		    AC_REQUIRE([AC_CANONICAL_HOST])
+
+			AS_CASE([${host_cpu}],
+				[x86_64],[libsubdirs="lib64 libx32 lib lib64"],
+				[ppc64|powerpc64|s390x|sparc64|aarch64|ppc64le|powerpc64le|riscv64],[libsubdirs="lib64 lib lib64"],
+				[libsubdirs="lib"]
+			)
+
+			for _AX_ZEEP_path in /usr /usr/local /opt /opt/local ; do
+				if test -d "$_AX_ZEEP_path/include/zeep" && test -r "$_AX_ZEEP_path/include/zeep" ; then
+
+					for libsubdir in $search_libsubdirs ; do
+						if ls "$_AX_ZEEP_path/$libsubdir/libzeep"* >/dev/null 2>&1 ; then break; fi
+					done
+					ZEEP_LDFLAGS="-L$_AX_ZEEP_path/$libsubdir"
+					ZEEP_CFLAGS="-I$_AX_ZEEP_path/include"
+					break;
+				fi
+			done
+
+			save_LDFLAGS=$LDFLAGS; LDFLAGS="$LDFLAGS $ZEEP_LDFLAGS"
+			save_CPPFLAGS=$CPPFLAGS; CPPFLAGS="$CPPFLAGS $ZEEP_CFLAGS"
+
 			AC_CHECK_HEADER(
 				[zeep/json/element.hpp],
 				[],
 				[AC_MSG_ERROR([
-	Can't find the libzeep header, zeep/json/element.hpp.  Make sure that libzeep
-	is installed, and either use the --with-zeep option or install
-	pkg-config.])])
+Can't find the libzeep header, zeep/json/element.hpp. Make sure that libzeep
+is installed, and either use the --with-zeep option or install pkg-config.])])
 
 			AX_CHECK_LIBRARY([ZEEP], [zeep/json/element.hpp], [zeep],
 				[ LIBS="-lzeep $LIBS" ],
 				[AC_MSG_ERROR([libzeep not found])])
+
+			LDFLAGS=$save_LDFLAGS
+			CPPFLAGS=$save_CPPFLAGS
 		fi
 	])
 ])

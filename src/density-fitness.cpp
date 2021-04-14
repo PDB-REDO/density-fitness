@@ -42,7 +42,7 @@
 
 #include "zeep/json/element.hpp"
 
-#include "pdb-redo/BondMap.hpp"
+#include "cif++/BondMap.hpp"
 #include "pdb-redo/Statistics.hpp"
 
 namespace po = boost::program_options;
@@ -73,7 +73,8 @@ int pr_main(int argc, char* argv[])
 		("output,o",			po::value<std::string>(),	"Write output to this file instead of stdout")
 		("output-format",		po::value<std::string>(),	"Output format, can be either 'edstats' or 'json'")
 		("use-auth-ids",									"Write auth_ identities instead of label_")
-		("dict",				po::value<std::string>(),	"Dictionary file containing restraints for residues in this specific target")
+		("mmcif-dictionary",	po::value<std::string>(),	"Path to the mmcif_pdbx.dic file to use instead of default")
+		("extra-compounds",		po::value<std::string>(),	"File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
 		("help,h",											"Display help message")
 		("version",											"Print version")
 		("verbose,v",										"Verbose output")
@@ -137,10 +138,15 @@ int pr_main(int argc, char* argv[])
 	if (vm.count("debug"))
 		cif::VERBOSE = vm["debug"].as<int>();
 
-	// Load dict, if any
+	// Load extra CCD definitions, if any
 	
-	if (vm.count("dict"))
-		c::CompoundFactory::instance().pushDictionary(vm["dict"].as<std::string>());
+	if (vm.count("extra-compounds"))
+		c::CompoundFactory::instance().pushDictionary(vm["extra-compounds"].as<std::string>());
+	
+	// And perhaps a private mmcif_pdbx dictionary
+
+	if (vm.count("mmcif-dictionary"))
+		cif::addFileResource("mmcif_pdbx_v50.dic", vm["extra-compounds"].as<std::string>());
 
 	mmcif::File f(vm["xyzin"].as<std::string>());
 	mmcif::Structure structure(f);

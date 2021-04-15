@@ -70,7 +70,7 @@ SEARCH_PATHS		= src test @LIBCIFPP_DATA_DIR@ @LIBPDB_REDO_DATA_DIR@
 
 OBJECTS				= $(PROGRAM).o
 
-RESOURCES			= bond-info.bin mmcif_pdbx_v50.dic
+RESOURCES			= mmcif_pdbx_v50.dic
 
 # Use the DEBUG flag to build debug versions of the code
 DEBUG				= @DEBUG@

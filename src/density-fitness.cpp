@@ -74,6 +74,7 @@ int pr_main(int argc, char* argv[])
 		("output-format",		po::value<std::string>(),	"Output format, can be either 'edstats' or 'json'")
 		("use-auth-ids",									"Write auth_ identities instead of label_")
 		("mmcif-dictionary",	po::value<std::string>(),	"Path to the mmcif_pdbx.dic file to use instead of default")
+		("compounds",			po::value<std::string>(),	"Location of the components.cif file from CCD")
 		("extra-compounds",		po::value<std::string>(),	"File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
 		("help,h",											"Display help message")
 		("version",											"Print version")
@@ -139,6 +140,9 @@ int pr_main(int argc, char* argv[])
 		cif::VERBOSE = vm["debug"].as<int>();
 
 	// Load extra CCD definitions, if any
+
+	if (vm.count("compounds"))
+		c::CompoundFactory::instance().setDefaultDictionary(vm["compounds"].as<std::string>());
 	
 	if (vm.count("extra-compounds"))
 		c::CompoundFactory::instance().pushDictionary(vm["extra-compounds"].as<std::string>());

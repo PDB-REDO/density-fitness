@@ -146,7 +146,7 @@ int pr_main(int argc, char* argv[])
 	// And perhaps a private mmcif_pdbx dictionary
 
 	if (vm.count("mmcif-dictionary"))
-		cif::addFileResource("mmcif_pdbx_v50.dic", vm["extra-compounds"].as<std::string>());
+		cif::addFileResource("mmcif_pdbx_v50.dic", vm["mmcif-dictionary"].as<std::string>());
 
 	mmcif::File f(vm["xyzin"].as<std::string>());
 	mmcif::Structure structure(f);

@@ -83,7 +83,8 @@ int pr_main(int argc, char* argv[])
 	
 	po::options_description hidden_options("hidden options");
 	hidden_options.add_options()
-		("debug,d",				po::value<int>(),		"Debug level (for even more verbose output)");
+		("components",			po::value<std::string>(),	"Location of the components.cif file from CCD, alias")
+		("debug,d",				po::value<int>(),			"Debug level (for even more verbose output)");
 
 	po::options_description cmdline_options;
 	cmdline_options.add(visible_options).add(hidden_options);
@@ -142,7 +143,9 @@ int pr_main(int argc, char* argv[])
 	// Load extra CCD definitions, if any
 
 	if (vm.count("compounds"))
-		c::CompoundFactory::instance().setDefaultDictionary(vm["compounds"].as<std::string>());
+		cif::addFileResource("components.cif", vm["compounds"].as<std::string>());
+	else if (vm.count("components"))
+		cif::addFileResource("components.cif", vm["components"].as<std::string>());
 	
 	if (vm.count("extra-compounds"))
 		c::CompoundFactory::instance().pushDictionary(vm["extra-compounds"].as<std::string>());

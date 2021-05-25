@@ -75,8 +75,17 @@ Used when recalculating maps.
 \fB--no-bulk\fR
 When specified, a bulk solvent mask is not used in recalculating the maps.
 .TP
-\fB--dict\fR=<file>
-Dictionary file containing restraints for residues in this specific target.
+\fB--components\fR (or \fB--compounds\fR)
+Specify the path of the CCD file components.cif. By default the one installed by
+libcifpp is used, use this option to override this default.
+.TP
+\fB--extra-compounds\fR
+A file containing information for residues in this specific target. This file
+may be in either CCD or CCP4 monomer library format.
+.TP
+\fB--mmcif-dictionary\fR
+Specify the path to the mmcif pdbx dictionary file. The default is to use the
+dictionary installed by libcifpp, use this option to override this default.
 .TP
 \fB--no-validate\fR
 Omit the validation of the input mmCIF file. This will force output even in

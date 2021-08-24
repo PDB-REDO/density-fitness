@@ -29,8 +29,6 @@
    Date: woensdag 27 december, 2017
 */
 
-#include "config.hpp"
-
 #include <fstream>
 #include <iomanip>
 #include <filesystem>

@@ -65,11 +65,13 @@ int pr_main(int argc, char* argv[])
 		("dfmap",				po::value<std::string>(),	"difference map file -- 2(mFo - DFc)")
 		("reshi",				po::value<float>(),			"High resolution")
 		("reslo",				po::value<float>(),			"Low resolution")
-		("sampling-rate",		po::value<float>(),			"Sampling rate")
+		("sampling-rate",		po::value<float>()->default_value(1.5f),
+															"Sampling rate")
 		("electron-scattering",								"Use electron scattering factors")
 		("no-edia",											"Skip EDIA score calculation")
 		("output,o",			po::value<std::string>(),	"Write output to this file instead of stdout")
-		("output-format",		po::value<std::string>(),	"Output format, can be either 'edstats' or 'json'")
+		("output-format",		po::value<std::string>()->default_value("json"),
+															"Output format, can be either 'edstats' or 'json'")
 		("use-auth-ids",									"Write auth_ identities instead of label_")
 		("mmcif-dictionary",	po::value<std::string>(),	"Path to the mmcif_pdbx.dic file to use instead of default")
 		("compounds",			po::value<std::string>(),	"Location of the components.cif file from CCD")
@@ -167,9 +169,7 @@ int pr_main(int argc, char* argv[])
 	
 	if (vm.count("hklin"))
 	{
-		float samplingRate = 0.75;
-		if (vm.count("sampling-rate"))
-			samplingRate = vm["sampling-rate"].as<float>();
+		float samplingRate = vm["sampling-rate"].as<float>();
 	
 		if (vm.count("recalc"))
 		{
@@ -211,9 +211,7 @@ int pr_main(int argc, char* argv[])
 		r = collector.collect();
 	}
 
-	bool formatAsJSON = true;
-	if (vm.count("output-format"))
-		formatAsJSON = vm["output-format"].as<std::string>() != "eds";
+	bool formatAsJSON = vm["output-format"].as<std::string>() == "json";
 
 	std::ofstream of;
 	io::filtering_stream<io::output> out;
@@ -240,7 +238,7 @@ int pr_main(int argc, char* argv[])
 			output = output.stem();
 		}
 
-		if (vm.count("output-format") == 0 and output.extension() == ".eds")
+		if (vm["output-format"].defaulted() and output.extension() == ".eds")
 			formatAsJSON = false;
 		
 		out.push(of);

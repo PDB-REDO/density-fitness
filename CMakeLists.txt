@@ -163,5 +163,12 @@ install(TARGETS ${PROJECT_NAME}
 
 # manual
 
-install(FILES doc/density-fitness.1 DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1)
+if(UNIX)
+	install(FILES doc/density-fitness.1
+		DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1)
+endif()
 
+if(EXISTS "${CCP4}/html")
+	install(FILES doc/density-fitness.html
+		DESTINATION ${CCP4}/html)
+endif()

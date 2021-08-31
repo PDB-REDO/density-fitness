@@ -9,12 +9,29 @@ Installation
 
 To install, first install  [`libcifpp`](https://github.com/PDB-REDO/libcifpp) and [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-redo) then use
 
+
 ```
-./configure
-make
-sudo make install
+git clone https://github.com/PDB-REDO/density-fitness.git
+cd density-fitness
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+cmake --install .
 ```
 
+This checks out the source code from github, creates a new directory
+where cmake stores its files. Run a configure, build the code and run
+tests. And then it installs the library and auxiliary files.
+
+The default is to install everything in `$HOME/.local` on Linux and
+`%LOCALAPPDATA%` on Windows (the AppData/Local folder in your home directory).
+You can change this by specifying the prefix with the
+[CMAKE_INSTALL_PREFIX](https://cmake.org/cmake/help/v3.21/variable/CMAKE_INSTALL_PREFIX.html)
+variable.
+
+Usage
+-----
 
 # Name
 

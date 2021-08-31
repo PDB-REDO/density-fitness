@@ -19,6 +19,17 @@ set(CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(NOT $ENV{CCP4} STREQUAL "")
+	set(BUILD_SHARED_LIBS ON)
+
+	set(CCP4 $ENV{CCP4})
+	list(PREPEND CMAKE_MODULE_PATH "${CCP4}/Lib")
+	list(APPEND CMAKE_PREFIX_PATH ${CCP4})
+	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+		set(CMAKE_PREFIX_PATH ${CCP4})
+	endif()
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter")
 endif()
@@ -44,7 +55,7 @@ if(MSVC)
 	add_definitions(-D_WIN32_WINNT=${ver})
 
 	# On Windows, do not install in the system location by default
-	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT DEFINED CCP4)
 		message(WARNING "The library and auxiliary files will be installed in $ENV{LOCALAPPDATA}/${PROJECT_NAME}")
 		set(CMAKE_INSTALL_PREFIX "$ENV{LOCALAPPDATA}/${PROJECT_NAME}" CACHE PATH "..." FORCE)
 	endif()
@@ -92,7 +103,7 @@ string(TIMESTAMP BUILD_DATE_TIME "%Y-%m-%d" UTC)
 configure_file("${CMAKE_SOURCE_DIR}/src/revision.hpp.in" "${CMAKE_BINARY_DIR}/revision.hpp" @ONLY)
 
 # Optionally use mrc to create resources
-find_program(MRC mrc HINTS "$ENV{LOCALAPPDATA}/mrc" "${CMAKE_INSTALL_PREFIX}/../mrc" "/usr/local/bin")
+find_program(MRC mrc HINTS "$ENV{LOCALAPPDATA}/mrc" "$ENV{LOCALAPPDATA}/mrc/bin" "${CMAKE_INSTALL_PREFIX}/../mrc" "/usr/local/bin")
 
 if(MRC)
 	option(USE_RSRC "Use mrc to create resources" ON)
@@ -112,16 +123,16 @@ set(THREADS_PREFER_PTHREAD_FLAG)
 find_package(Threads REQUIRED)
 
 set (Boost_DETAILED_FAILURE_MSG ON)
-find_package(Boost 1.71.0 REQUIRED COMPONENTS program_options system iostreams regex date_time)
+find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options system iostreams regex date_time)
 # extra diagnostic -- helpful for problem with FindBoost.cmake
 message(STATUS "Boost headers in: ${Boost_INCLUDE_DIR}")
 message(STATUS "Boost libraries in: ${Boost_LIBRARY_DIRS}")
 
 find_package(ZLIB)
 find_package(BZip2)
-find_package(cifpp 1.0 REQUIRED)
-find_package(pdb-redo REQUIRED)
+find_package(cifpp 1.1 REQUIRED)
 find_package(zeep REQUIRED)
+find_package(pdb-redo REQUIRED)
 
 if(USE_RSRC)
 	add_compile_definitions("DATA_DIR=\"${CIFPP_SHARE_DIR}\"")

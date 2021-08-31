@@ -1,0 +1,5 @@
+Version 1.0.1
+- Change from GNU configure to cmake
+
+Version 1.0.0
+- Initial release

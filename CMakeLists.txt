@@ -130,9 +130,9 @@ message(STATUS "Boost libraries in: ${Boost_LIBRARY_DIRS}")
 
 find_package(ZLIB)
 find_package(BZip2)
-find_package(cifpp 1.1 REQUIRED)
-find_package(zeep REQUIRED)
-find_package(pdb-redo REQUIRED)
+find_package(cifpp 2.0 REQUIRED)
+find_package(zeep 5.1 REQUIRED)
+find_package(pdb-redo 2.0 REQUIRED)
 
 if(USE_RSRC)
 	add_compile_definitions("DATA_DIR=\"${CIFPP_SHARE_DIR}\"")

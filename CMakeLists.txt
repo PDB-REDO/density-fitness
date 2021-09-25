@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 # set the project name
-project(density-fitness VERSION 1.0.1 LANGUAGES CXX)
+project(density-fitness VERSION 1.0.1 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -9,10 +9,12 @@ enable_testing()
 
 include(GNUInstallDirs)
 include(CheckFunctionExists)
+include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
 include(CMakePackageConfigHelpers)
 include(Dart)
+include(FindFilesystem)
 include(GenerateExportHeader)
 
 set(CXX_EXTENSIONS OFF)
@@ -122,7 +124,8 @@ set(CMAKE_THREAD_PREFER_PTHREAD)
 set(THREADS_PREFER_PTHREAD_FLAG)
 find_package(Threads REQUIRED)
 
-set (Boost_DETAILED_FAILURE_MSG ON)
+set(Boost_DETAILED_FAILURE_MSG ON)
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options system iostreams regex date_time)
 # extra diagnostic -- helpful for problem with FindBoost.cmake
 message(STATUS "Boost headers in: ${Boost_INCLUDE_DIR}")
@@ -130,32 +133,21 @@ message(STATUS "Boost libraries in: ${Boost_LIBRARY_DIRS}")
 
 find_package(ZLIB)
 find_package(BZip2)
-find_package(cifpp 2.0 REQUIRED)
-find_package(zeep 5.1 REQUIRED)
 find_package(pdb-redo 2.0 REQUIRED)
+
+find_library(NEWUOA_LIBRARY newuoa REQUIRED)
+find_path(NEWUOA_INCLUDE_DIR newuoa.h)
+check_include_file( "newuoa.h" HAVE_NEWUOA )
+
 
 if(USE_RSRC)
 	add_compile_definitions("DATA_DIR=\"${CIFPP_SHARE_DIR}\"")
 endif()
 
-include_directories(${Boost_INCLUDE_DIR} cifpp::cifpp pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include)
-link_libraries(${Boost_LIBRARIES} cifpp::cifpp pdb-redo::pdb-redo ${CMAKE_THREAD_LIBS_INIT})
-
-if (ZLIB_FOUND)
-	link_libraries(ZLIB::ZLIB)
-endif()
-
-if (BZIP2_FOUND)
-	link_libraries(BZip2::BZip2)
-endif()
-
-include_directories(
-    ${PROJECT_SOURCE_DIR}/src
-	PUBLIC ${cifpp_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
-)
-
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp)
+
+target_link_libraries(${PROJECT_NAME} pdb-redo::pdb-redo ${CMAKE_THREAD_LIBS_INIT} ZLIB::ZLIB BZip2::BZip2 std::filesystem)
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${BIN_INSTALL_DIR}

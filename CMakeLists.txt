@@ -141,12 +141,16 @@ if(USE_RSRC STREQUAL "ON")
 	add_compile_definitions(USE_RSRC)
 endif()
 
-
 # libraries
 
 set(CMAKE_THREAD_PREFER_PTHREAD)
 set(THREADS_PREFER_PTHREAD_FLAG)
 find_package(Threads)
+
+set(Boost_DETAILED_FAILURE_MSG ON)
+if(NOT BUILD_SHARED_LIBS)
+	set(Boost_USE_STATIC_LIBS ON)
+endif()
 
 find_package(pdb-redo 2.0.0 REQUIRED)
 

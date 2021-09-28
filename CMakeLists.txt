@@ -1,11 +1,33 @@
+# SPDX-License-Identifier: BSD-2-Clause
+
+# Copyright (c) 2021 NKI/AVL, Netherlands Cancer Institute
+
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 cmake_minimum_required(VERSION 3.15)
 
 # set the project name
-project(density-fitness VERSION 1.0.1 LANGUAGES CXX)
+project(density-fitness VERSION 1.0.2 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-enable_testing()
 
 include(GNUInstallDirs)
 include(CheckFunctionExists)
@@ -13,28 +35,29 @@ include(CheckIncludeFiles)
 include(CheckLibraryExists)
 include(CMakePackageConfigHelpers)
 include(Dart)
+include(FindFilesystem)
 include(GenerateExportHeader)
 
 set(CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(NOT $ENV{CCP4} STREQUAL "")
-	set(BUILD_SHARED_LIBS ON)
+find_package(Filesystem REQUIRED)
 
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers")
+elseif(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+endif()
+
+if(NOT "$ENV{CCP4}" STREQUAL "")
 	set(CCP4 $ENV{CCP4})
 	list(PREPEND CMAKE_MODULE_PATH "${CCP4}/Lib")
 	list(APPEND CMAKE_PREFIX_PATH ${CCP4})
 	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 		set(CMAKE_PREFIX_PATH ${CCP4})
 	endif()
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter")
-endif()
-if(MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
 endif()
 
 if(MSVC)
@@ -54,9 +77,9 @@ if(MSVC)
 	get_WIN32_WINNT(ver)
 	add_definitions(-D_WIN32_WINNT=${ver})
 
-	# On Windows, do not install in the system location by default
-	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT DEFINED CCP4)
-		message(WARNING "The library and auxiliary files will be installed in $ENV{LOCALAPPDATA}/${PROJECT_NAME}")
+	# On Windows, do not install in the system location
+	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT BUILD_FOR_CCP4)
+		message(STATUS "The library and auxiliary files will be installed in $ENV{LOCALAPPDATA}/${PROJECT_NAME}")
 		set(CMAKE_INSTALL_PREFIX "$ENV{LOCALAPPDATA}/${PROJECT_NAME}" CACHE PATH "..." FORCE)
 	endif()
 
@@ -94,12 +117,11 @@ if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
 else()
     message(WARNING "Git not found, cannot set version info")
 
-    SET(BUILD_VERSION_STRING "unknown")
+    SET(BUILD_VERSION_STRING ${PROJECT_VERSION})
 endif()
 
 # generate version.h
-include_directories(${CMAKE_BINARY_DIR} PRIVATE)
-string(TIMESTAMP BUILD_DATE_TIME "%Y-%m-%d" UTC)
+string(TIMESTAMP BUILD_DATE_TIME "%Y-%m-%dT%H:%M:%SZ" UTC)
 configure_file("${CMAKE_SOURCE_DIR}/src/revision.hpp.in" "${CMAKE_BINARY_DIR}/revision.hpp" @ONLY)
 
 # Optionally use mrc to create resources
@@ -118,44 +140,29 @@ if(USE_RSRC STREQUAL "ON")
 	add_compile_definitions(USE_RSRC)
 endif()
 
+
+# libraries
+
 set(CMAKE_THREAD_PREFER_PTHREAD)
 set(THREADS_PREFER_PTHREAD_FLAG)
-find_package(Threads REQUIRED)
+find_package(Threads)
 
-set (Boost_DETAILED_FAILURE_MSG ON)
-find_package(Boost 1.70.0 REQUIRED COMPONENTS program_options system iostreams regex date_time)
-# extra diagnostic -- helpful for problem with FindBoost.cmake
-message(STATUS "Boost headers in: ${Boost_INCLUDE_DIR}")
-message(STATUS "Boost libraries in: ${Boost_LIBRARY_DIRS}")
-
-find_package(ZLIB)
-find_package(BZip2)
-find_package(cifpp 2.0 REQUIRED)
-find_package(zeep 5.1 REQUIRED)
-find_package(pdb-redo 2.0 REQUIRED)
+find_package(pdb-redo 2.0.0 REQUIRED)
 
 if(USE_RSRC)
-	add_compile_definitions("DATA_DIR=\"${CIFPP_SHARE_DIR}\"")
+	add_custom_command(OUTPUT density-fitness_rsrc.obj
+		COMMAND ${MRC} -o density-fitness_rsrc.obj ${CIFPP_SHARE_DIR}/mmcif_pdbx_v50.dic ${COFF_SPEC}
+	)
+
+	set(density-fitness_RESOURCE density-fitness_rsrc.obj)
 endif()
-
-include_directories(${Boost_INCLUDE_DIR} cifpp::cifpp pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include)
-link_libraries(${Boost_LIBRARIES} cifpp::cifpp pdb-redo::pdb-redo ${CMAKE_THREAD_LIBS_INIT})
-
-if (ZLIB_FOUND)
-	link_libraries(ZLIB::ZLIB)
-endif()
-
-if (BZIP2_FOUND)
-	link_libraries(BZip2::BZip2)
-endif()
-
-include_directories(
-    ${PROJECT_SOURCE_DIR}/src
-	PUBLIC ${cifpp_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
-)
 
 add_executable(density-fitness
-	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp)
+	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp
+	${density-fitness_RESOURCE})
+
+target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${cifpp_INCLUDE_DIRS} ${CMAKE_BINARY_DIR})
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_THREAD_LIBS_INIT})
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${BIN_INSTALL_DIR}

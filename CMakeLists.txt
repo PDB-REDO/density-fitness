@@ -31,6 +31,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GNUInstallDirs)
 include(CheckFunctionExists)
+include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
 include(CMakePackageConfigHelpers)
@@ -162,7 +163,7 @@ add_executable(density-fitness
 	${density-fitness_RESOURCE})
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${cifpp_INCLUDE_DIRS} ${CMAKE_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_THREAD_LIBS_INIT} std::filesystem)
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${BIN_INSTALL_DIR}

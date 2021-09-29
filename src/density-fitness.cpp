@@ -35,7 +35,6 @@
 
 #include <boost/program_options.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
 #include "zeep/json/element.hpp"
@@ -230,11 +229,6 @@ int pr_main(int argc, char* argv[])
 		if (output.extension() == ".gz")
 		{
 			out.push(io::gzip_compressor());
-			output = output.stem();
-		}
-		else if (output.extension() == ".bz2")
-		{
-			out.push(io::bzip2_compressor());
 			output = output.stem();
 		}
 

@@ -45,7 +45,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Filesystem REQUIRED)
 
-
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers")
 elseif(MSVC)
@@ -143,10 +142,6 @@ endif()
 
 # libraries
 
-set(CMAKE_THREAD_PREFER_PTHREAD)
-set(THREADS_PREFER_PTHREAD_FLAG)
-find_package(Threads)
-
 set(Boost_DETAILED_FAILURE_MSG ON)
 if(NOT BUILD_SHARED_LIBS)
 	set(Boost_USE_STATIC_LIBS ON)
@@ -167,7 +162,7 @@ add_executable(density-fitness
 	${density-fitness_RESOURCE})
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${cifpp_INCLUDE_DIRS} ${CMAKE_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_THREAD_LIBS_INIT} std::filesystem)
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo std::filesystem)
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${BIN_INSTALL_DIR}

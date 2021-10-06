@@ -147,7 +147,7 @@ if(NOT BUILD_SHARED_LIBS)
 	set(Boost_USE_STATIC_LIBS ON)
 endif()
 
-find_package(pdb-redo 2.0.0 REQUIRED)
+find_package(pdb-redo 2.0.1 REQUIRED)
 
 if(USE_RSRC)
 	add_custom_command(OUTPUT density-fitness_rsrc.obj

@@ -103,7 +103,7 @@ _reshi_ and _reslo_ options.
   The MTZ file. If this option is specified, the maps will be calculated using
   the information in this file.
 * **--sampling-rate**
-  The sampling rate to use when creating maps. Default is 0.75.
+  The sampling rate to use when creating maps. Default is 1.5.
 * **--recalc**
   By default the maps are read from the MTZ file, but you can also opt to
   recalculate the maps, e.g. when the structure no longer corresponds to

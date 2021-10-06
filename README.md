@@ -7,7 +7,9 @@ of programs.
 Installation
 ------------
 
-To install, first install  [`libcifpp`](https://github.com/PDB-REDO/libcifpp) and [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-redo) then use
+See the documentation for [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-redo) on installing all prerequisites.
+
+After that, density-fitness can be built as follows:
 
 
 ```
@@ -16,9 +18,11 @@ cd density-fitness
 mkdir build
 cd build
 cmake ..
-cmake --build . --config Release
+cmake --build .
 cmake --install .
 ```
+
+When building on Windows you should replace `cmake --build .` with `cmake --build . --config Release`.
 
 This checks out the source code from github, creates a new directory
 where cmake stores its files. Run a configure, build the code and run

@@ -41,13 +41,12 @@
 
 #include "cif++/BondMap.hpp"
 #include "pdb-redo/Statistics.hpp"
+#include "revision.hpp"
 
 namespace po = boost::program_options;
 namespace fs = std::filesystem;
 namespace c = mmcif;
 namespace io = boost::iostreams;
-
-std::string VERSION_STRING;
 
 // --------------------------------------------------------------------
 
@@ -105,7 +104,7 @@ int pr_main(int argc, char* argv[])
 
 	if (vm.count("version"))
 	{
-		std::cout << argv[0] << " version " << VERSION_STRING << std::endl;
+		write_version_string(std::cout, vm.count("verbose"));
 		exit(0);
 	}
 
@@ -164,7 +163,7 @@ int pr_main(int argc, char* argv[])
 		electronScattering = not exptl.empty() and exptl.front()["method"] == "ELECTRON CRYSTALLOGRAPHY";
 	}
 	
-	c::MapMaker<float> mm;
+	pdb_redo::MapMaker<float> mm;
 	
 	if (vm.count("hklin"))
 	{
@@ -172,13 +171,13 @@ int pr_main(int argc, char* argv[])
 	
 		if (vm.count("recalc"))
 		{
-			auto aniso = c::MapMaker<float>::as_None;
+			auto aniso = pdb_redo::MapMaker<float>::as_None;
 			if (vm.count("aniso-scaling"))
 			{
 				if (vm["aniso-scaling"].as<std::string>() == "observed")
-					aniso = c::MapMaker<float>::as_Observed;
+					aniso = pdb_redo::MapMaker<float>::as_Observed;
 				else if (vm["aniso-scaling"].as<std::string>() == "calculated")
-					aniso = c::MapMaker<float>::as_Calculated;
+					aniso = pdb_redo::MapMaker<float>::as_Calculated;
 			}
 			
 			mm.calculate(
@@ -195,18 +194,18 @@ int pr_main(int argc, char* argv[])
 		mm.loadMaps(vm["fomap"].as<std::string>(), vm["dfmap"].as<std::string>(), reshi, reslo);
 	}
 	
-	std::vector<mmcif::ResidueStatistics> r;
+	std::vector<pdb_redo::ResidueStatistics> r;
 	
 	if (vm.count("no-edia"))
 	{
-		mmcif::StatsCollector collector(mm, structure, electronScattering);
+		pdb_redo::StatsCollector collector(mm, structure, electronScattering);
 		r = collector.collect();
 	}
 	else
 	{
 		mmcif::BondMap bm(structure);
 
-		mmcif::EDIAStatsCollector collector(mm, structure, electronScattering, bm);
+		pdb_redo::EDIAStatsCollector collector(mm, structure, electronScattering, bm);
 		r = collector.collect();
 	}
 
@@ -315,71 +314,6 @@ int pr_main(int argc, char* argv[])
 
 // --------------------------------------------------------------------
 
-namespace {
-	std::string gVersionNr, gVersionDate;
-}
-
-void load_version_info()
-{
-	const std::regex
-		rxVersionNr(R"(build-(\d+)-g[0-9a-f]{7}(-dirty)?)"),
-		rxVersionDate(R"(Date: +(\d{4}-\d{2}-\d{2}).*)"),
-		rxVersionNr2(R"(density-fitness-version: (\d+(?:\.\d+)+))");
-
-#include "revision.hpp"
-
-	struct membuf : public std::streambuf
-	{
-		membuf(char* data, size_t length)       { this->setg(data, data, data + length); }
-	} buffer(const_cast<char*>(kRevision), sizeof(kRevision));
-
-	std::istream is(&buffer);
-
-	std::string line;
-
-	while (getline(is, line))
-	{
-		std::smatch m;
-
-		if (std::regex_match(line, m, rxVersionNr))
-		{
-			gVersionNr = m[1];
-			if (m[2].matched)
-				gVersionNr += '*';
-			continue;
-		}
-
-		if (std::regex_match(line, m, rxVersionDate))
-		{
-			gVersionDate = m[1];
-			continue;
-		}
-
-		// always the first, replace with more specific if followed by the other info
-		if (std::regex_match(line, m, rxVersionNr2))
-		{
-			gVersionNr = m[1];
-			continue;
-		}
-	}
-
-	if (not VERSION_STRING.empty())
-		VERSION_STRING += "\n";
-	VERSION_STRING += gVersionNr + " " + gVersionDate;
-}
-
-std::string get_version_nr()
-{
-	return gVersionNr/* + '/' + cif::get_version_nr()*/;
-}
-
-std::string get_version_date()
-{
-	return gVersionDate;
-}
-
-// --------------------------------------------------------------------
-
 // recursively print exception whats:
 void print_what (const std::exception& e)
 {
@@ -401,8 +335,6 @@ int main(int argc, char* argv[])
 	
 	try
 	{
-		load_version_info();
-		
 		result = pr_main(argc, argv);
 	}
 	catch (std::exception& ex)

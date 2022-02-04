@@ -1,3 +1,7 @@
+Version 1.0.3
+- PDB-REDO dependency updated
+- Improved makefile
+
 Version 1.0.2
 - New dependencies
 - Update build system

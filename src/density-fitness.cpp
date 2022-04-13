@@ -247,7 +247,7 @@ int pr_main(int argc, char* argv[])
 		
 		for (auto i: r)
 		{
-			std::tuple<std::string,int,std::string,std::string> pdbID = structure.MapLabelToPDB(i.asymID, i.seqID, i.compID, i.authSeqID);
+			auto &res = structure.getResidue(i.asymID, i.seqID, i.authSeqID);
 
 			stats.emplace_back(object{
 				{ "asymID", i.asymID },
@@ -255,10 +255,10 @@ int pr_main(int argc, char* argv[])
 				{ "compID", i.compID },
 				{
 					"pdb", {
-						{ "strandID", std::get<0>(pdbID) },
-						{ "seqNum", std::get<1>(pdbID) },
-						{ "compID", std::get<2>(pdbID) },
-						{ "insCode", std::get<3>(pdbID) }
+						{ "strandID", res.authAsymID() },
+						{ "seqNum", res.authSeqID() },
+						{ "compID", i.compID },
+						{ "insCode", res.authInsCode() }
 					}
 				},
 				{ "RSR", i.RSR },
@@ -290,8 +290,9 @@ int pr_main(int argc, char* argv[])
 			
 			if (writeAuth)
 			{
-				std::tuple<std::string,int,std::string,std::string> pdbID = structure.MapLabelToPDB(i.asymID, i.seqID, i.compID, i.authSeqID);
-				id = std::get<2>(pdbID) + '_' + std::get<0>(pdbID) + '_' + std::to_string(std::get<1>(pdbID)) + std::get<3>(pdbID);
+				auto &res = structure.getResidue(i.asymID, i.seqID, i.authSeqID);
+
+				id = i.compID + '_' + res.authAsymID() + '_' + res.authSeqID() + res.authInsCode();
 			}
 			else if (i.compID == "HOH")
 				id = i.compID + '_' + i.asymID + '_' + i.authSeqID;

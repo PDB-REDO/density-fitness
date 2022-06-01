@@ -256,7 +256,7 @@ int pr_main(int argc, char* argv[])
 				{
 					"pdb", {
 						{ "strandID", res.authAsymID() },
-						{ "seqNum", std::stoi(res.authSeqID()) },
+						{ "seqNum", i.authSeqID },
 						{ "compID", i.compID },
 						{ "insCode", res.authInsCode() }
 					}

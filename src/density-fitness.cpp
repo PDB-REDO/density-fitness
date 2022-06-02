@@ -256,7 +256,7 @@ int pr_main(int argc, char* argv[])
 				{
 					"pdb", {
 						{ "strandID", res.authAsymID() },
-						{ "seqNum", i.authSeqID },
+						{ "seqNum", i.authSeqID.empty() ? 0 : stoi(i.authSeqID) },
 						{ "compID", i.compID },
 						{ "insCode", res.authInsCode() }
 					}

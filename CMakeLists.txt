@@ -25,7 +25,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 # set the project name
-project(density-fitness VERSION 1.0.4 LANGUAGES CXX)
+project(density-fitness VERSION 1.0.5 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -121,7 +121,7 @@ if(USE_RSRC)
 endif()
 
 # libraries
-find_package(pdb-redo 3.0.0 REQUIRED)
+find_package(pdb-redo 3.0.1 REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
 add_executable(density-fitness

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+density_fitness="../build/density-fitness --sampling-rate=2.2"
+
 mkmap () {
 	pdbid=$1
 	grpid=${pdbid:1:2}
@@ -27,7 +29,7 @@ mkmap () {
 
 fetchmap () {
 	pdbid=$1
-	snarf "http://www.ebi.ac.uk/pdbe/coordinates/files/${pdbid}_map.mtz"
+	wget "http://www.ebi.ac.uk/pdbe/coordinates/files/${pdbid}_map.mtz"
 }
 
 eds () {
@@ -48,7 +50,13 @@ eds () {
 	fi
 	
 	edstats.pl -hklin $hklin -xyzin $xyzin -atomsf atomsf -output $tmpdir/edstats.out -debug
-	perl /home/maarten/bin/fmt-eds.pl $tmpdir/edstats.out > $edsout
+
+	if [ ! -f $tmpdir/edstats.out ]; then
+		echo 'edstats failed!'
+		exit
+	fi
+
+	perl fmt-eds.pl $tmpdir/edstats.out > $edsout
 }
 
 cmp-eds () {
@@ -63,7 +71,7 @@ calc-stats () {
 	mtz_file=${2:-${pdb_file%.pdb}.mtz}
 	eds_file=${3:-${pdb_file%.pdb}.eds}
 
-	/home/maarten/projects/density-fitness/build/density-fitness --hklin $mtz_file --xyzin $pdb_file --output $eds_file
+	echo ${density_fitness} --hklin $mtz_file --xyzin $pdb_file --output $eds_file --verbose
 }
 
 pdbid=$1
@@ -71,6 +79,11 @@ pdb_gz_file=pdb${pdbid}.ent.gz
 
 if [ ! -f ${pdb_gz_file} ]; then
 	pdb_gz_file=/srv/data/pdb/pdb/${pdbid:1:2}/pdb${pdbid}.ent.gz
+fi
+
+if [ ! -f ${pdb_gz_file} ] && [ -f /srv/data/pdb/mmCIF/${pdbid:1:2}/${pdbid}.cif.gz ]; then
+	pdb_gz_file=pdb${pdbid}.ent.gz
+	cif2pdb /srv/data/pdb/mmCIF/${pdbid:1:2}/${pdbid}.cif.gz ${pdb_gz_file}
 fi
 
 if [ ! -f ${pdb_gz_file} ]; then
@@ -121,14 +134,24 @@ fi
 eds_file=${pdbid}.eds
 if [ ! -f $eds_file ]; then
 	echo "Creating eds file with edstats"
-	echo $args | edstats MAPIN1 fo.map MAPIN2 df.map XYZIN $pdb_file PDBOUT /dev/null OUTPUT ${pdbid}-edstats.out
-	perl fmt-eds.pl ${pdbid}-edstats.out > $eds_file
+	# echo $args | edstats MAPIN1 fo.map MAPIN2 df.map XYZIN $pdb_file PDBOUT /dev/null OUTPUT ${pdbid}-edstats.out
+
+	eds ${mtz_file} ${pdb_file} ${eds_file}
+
+	# if [ ! -f ${pdbid}-edstats.out ]; then
+	# 	echo 'edstats failed!'
+	# 	exit
+	# fi
+
+	# perl fmt-eds.pl ${pdbid}-edstats.out > $eds_file
 fi
 
 eds_file_mine=${pdbid}-mine.eds
 if [ ! -f $eds_file_mine ]; then
 	echo "Creating eds file with my stats"
-	/home/maarten/projects/density-fitness/build/density-fitness --hklin $mtz_fix_file --xyzin $pdb_file -o $eds_file_mine
+	# ${density_fitness} --hklin $mtz_fix_file --xyzin $pdb_file -o $eds_file_mine --verbose
+	${density_fitness} --hklin $mtz_file --xyzin $pdb_file -o $eds_file_mine --verbose
+	# calc-stats ${mtz_file} ${pdb_file} ${eds_file_mine}
 fi
 
 echo "Vergelijk eds files"
@@ -137,17 +160,17 @@ svg_file=${pdbid}-${pdbid}-mine.svg
 
 perl plot-eds.pl $eds_file $eds_file_mine
 
-eds_file_mine_recalc=${pdbid}-mine-recalc.eds
-if [ ! -f $eds_file_mine_recalc ]; then
-	echo "Creating eds file with my stats and recalculated maps"
-	/home/maarten/projects/density-fitness/build/density-fitness --hklin $mtz_fix_file --xyzin $pdb_file --recalc -o $eds_file_mine_recalc
-fi
+# eds_file_mine_recalc=${pdbid}-mine-recalc.eds
+# if [ ! -f $eds_file_mine_recalc ]; then
+# 	echo "Creating eds file with my stats and recalculated maps"
+# 	${density_fitness} --hklin $mtz_file --xyzin $pdb_file --recalc -o $eds_file_mine_recalc --verbose
+# fi
 
-echo "Vergelijk eds files"
-cmp-eds $eds_file ${pdbid}-mine-recalc.eds
-svg_file=${pdbid}-${pdbid}-mine-recalc.svg
+# echo "Vergelijk eds files"
+# cmp-eds $eds_file ${pdbid}-mine-recalc.eds
+# svg_file=${pdbid}-${pdbid}-mine-recalc.svg
 
-#echo "Toon verschillen"
-#firefox $svg_file
+# #echo "Toon verschillen"
+# #firefox $svg_file
 
-perl plot-eds.pl $eds_file $eds_file_mine_recalc
+# perl plot-eds.pl $eds_file $eds_file_mine_recalc

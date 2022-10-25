@@ -1,0 +1,6 @@
+[submodule "libconfig"]
+	path = libconfig
+	url = https://github.com/mhekkel/libconfig.git
+[submodule "gxrio"]
+	path = gxrio
+	url = https://github.com/mhekkel/gxrio.git

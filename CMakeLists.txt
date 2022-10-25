@@ -37,6 +37,7 @@ include(CheckLibraryExists)
 include(CMakePackageConfigHelpers)
 include(Dart)
 include(GenerateExportHeader)
+include(AddGitSubmodule)
 
 set(CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
@@ -82,20 +83,6 @@ if(MSVC)
 
 	get_WIN32_WINNT(ver)
 	add_definitions(-D_WIN32_WINNT=${ver})
-
-	# On Windows, do not install in the system location
-	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT BUILD_FOR_CCP4)
-		message(STATUS "The library and auxiliary files will be installed in $ENV{LOCALAPPDATA}/${PROJECT_NAME}")
-		set(CMAKE_INSTALL_PREFIX "$ENV{LOCALAPPDATA}/${PROJECT_NAME}" CACHE PATH "..." FORCE)
-	endif()
-endif()
-
-if(UNIX AND NOT APPLE)
-	# On Linux, install in the $HOME/.local folder by default
-	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-		message(WARNING "The library and auxiliary files will be installed in $ENV{HOME}/.local")
-		set(CMAKE_INSTALL_PREFIX "$ENV{HOME}/.local" CACHE PATH "..." FORCE)
-	endif()
 endif()
 
 # Create a revision file, containing the current git version info
@@ -121,8 +108,12 @@ if(USE_RSRC)
 endif()
 
 # libraries
+find_package(zeep REQUIRED)
+
 find_package(pdb-redo 3.0.1 REQUIRED)
-find_package(Boost COMPONENTS program_options REQUIRED)
+
+add_git_submodule(libconfig EXCLUDE_FROM_ALL)
+add_git_submodule(gxrio EXCLUDE_FROM_ALL)
 
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp
@@ -133,7 +124,7 @@ if(USE_RSRC)
 endif()
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo Boost::program_options)
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio)
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${BIN_INSTALL_DIR}

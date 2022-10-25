@@ -33,211 +33,216 @@
 #include <iomanip>
 #include <filesystem>
 
-#include <boost/program_options.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
+#include <zeep/json/element.hpp>
+#include <cfg.hpp>
+#include <gxrio.hpp>
 
-#include "zeep/json/element.hpp"
+#include <pdb-redo/BondMap.hpp>
+#include <pdb-redo/Statistics.hpp>
 
-#include "cif++/BondMap.hpp"
-#include "pdb-redo/Statistics.hpp"
 #include "revision.hpp"
 
-namespace po = boost::program_options;
 namespace fs = std::filesystem;
-namespace c = mmcif;
-namespace io = boost::iostreams;
 
 // --------------------------------------------------------------------
 
 int pr_main(int argc, char* argv[])
 {
-	po::options_description visible_options(fs::path(argv[0]).filename().string() + " [options] <mtzfile> <coordinatesfile> [<output>]");
-	visible_options.add_options()
-		("hklin",				po::value<std::string>(),	"mtz file")
-		("recalc",											"Recalculate Fc from FP/SIGFP in mtz file")
-		("aniso-scaling",		po::value<std::string>(),	"Anisotropic scaling (none/observed/calculated)")
-		("no-bulk",											"No bulk correction")
-		("xyzin",				po::value<std::string>(),	"coordinates file")
-		("fomap",				po::value<std::string>(),	"Fo map file -- 2mFo - DFc")
-		("dfmap",				po::value<std::string>(),	"difference map file -- 2(mFo - DFc)")
-		("reshi",				po::value<float>(),			"High resolution")
-		("reslo",				po::value<float>(),			"Low resolution")
-		("sampling-rate",		po::value<float>()->default_value(1.5f),
-															"Sampling rate")
-		("electron-scattering",								"Use electron scattering factors")
-		("no-edia",											"Skip EDIA score calculation")
-		("output,o",			po::value<std::string>(),	"Write output to this file instead of stdout")
-		("output-format",		po::value<std::string>()->default_value("json"),
-															"Output format, can be either 'edstats' or 'json'")
-		("use-auth-ids",									"Write auth_ identities instead of label_")
-		("mmcif-dictionary",	po::value<std::string>(),	"Path to the mmcif_pdbx.dic file to use instead of default")
-		("compounds",			po::value<std::string>(),	"Location of the components.cif file from CCD")
-		("extra-compounds",		po::value<std::string>(),	"File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
-		("help,h",											"Display help message")
-		("version",											"Print version")
-		("verbose,v",										"Verbose output")
-		;
-	
-	po::options_description hidden_options("hidden options");
-	hidden_options.add_options()
-		("components",			po::value<std::string>(),	"Location of the components.cif file from CCD, alias")
-		("debug,d",				po::value<int>(),			"Debug level (for even more verbose output)");
+	auto &config = cfg::config::instance();
 
-	po::options_description cmdline_options;
-	cmdline_options.add(visible_options).add(hidden_options);
+	auto usage = [argv,&config]()
+	{
+		std::cout << fs::path(argv[0]).filename().string() << " [options] <mtzfile> <coordinatesfile> [<output>]" << std::endl
+				  << config << std::endl;
+	};
 
-	po::positional_options_description p;
-	p.add("hklin", 1);
-	p.add("xyzin", 1);
-	p.add("output", 1);
-	
-	po::variables_map vm;
-	po::store(po::command_line_parser(argc, argv).options(cmdline_options).positional(p).run(), vm);
-	po::notify(vm);
+	config.init(
+		cfg::make_option("help,h", "Display help message"),
+		cfg::make_option("version", "Print version"),
+		cfg::make_option("verbose,v", "Verbose output"),
+		cfg::make_option<std::string>("hklin", "mtz file"),
+		cfg::make_option<std::string>("xyzin", "coordinates file"),
+		cfg::make_option<std::string>("output,o", "Write output to this file instead of stdout"),
+		cfg::make_option<std::string>("output-format", "json", "Output format, can be either 'edstats' or 'json'"),
+		cfg::make_option("recalc", "Recalculate Fc from FP/SIGFP in mtz file"),
+		cfg::make_option<std::string>("aniso-scaling", "Anisotropic scaling (none/observed/calculated)"),
+		cfg::make_option("no-bulk", "No bulk correction"),
+		cfg::make_option<std::string>("fomap", "Fo map file -- 2mFo - DFc"),
+		cfg::make_option<std::string>("dfmap", "difference map file -- 2(mFo - DFc)"),
+		cfg::make_option<float>("reshi", "High resolution"),
+		cfg::make_option<float>("reslo", "Low resolution"),
+		cfg::make_option<float>("sampling-rate", 1.5f, "Sampling rate"),
+		cfg::make_option("electron-scattering", "Use electron scattering factors"),
+		cfg::make_option("no-edia", "Skip EDIA score calculation"),
+		cfg::make_option("use-auth-ids", "Write auth_ identities instead of label_"),
+		cfg::make_option<std::string>("mmcif-dictionary", "Path to the mmcif_pdbx.dic file to use instead of default"),
+		cfg::make_option<std::string>("compounds", "Location of the components.cif file from CCD"),
+		cfg::make_option<std::string>("extra-compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
+	);
 
-//	po::variables_map vm;
-//	po::store(po::command_line_parser(argc, argv).options(cmdline_options).run(), vm);
-//	po::notify(vm);
+	config.parse(argc, argv);
 
 	// --------------------------------------------------------------------
 
-	if (vm.count("version"))
+	if (config.has("version"))
 	{
-		write_version_string(std::cout, vm.count("verbose"));
+		write_version_string(std::cout, config.has("verbose"));
 		exit(0);
 	}
 
-	if (vm.count("help"))
+	if (config.has("help"))
 	{
-		std::cerr << visible_options << std::endl;
+		usage();
 		return 0;
 	}
+
+	// --------------------------------------------------------------------
 	
-	if (vm.count("xyzin") == 0 or
-		(vm.count("hklin") == 0 and (vm.count("fomap") == 0 or vm.count("dfmap") == 0)))
+	fs::path hklin, xyzin, output;
+
+	if (config.has("hklin"))
+		hklin = config.get<std::string>("hklin");
+
+	if (config.has("xyzin"))
+		xyzin = config.get<std::string>("xyzin");
+
+	if (config.has("output"))
+		output = config.get<std::string>("output");
+
+	std::deque<std::string> operands(config.operands().begin(), config.operands().end());
+
+	if (hklin.empty() and not operands.empty())
 	{
-		std::cerr << visible_options << std::endl;
+		hklin = operands.front();
+		operands.pop_front();
+	}
+	
+	if (xyzin.empty() and not operands.empty())
+	{
+		xyzin = operands.front();
+		operands.pop_front();
+	}
+	
+	if (output.empty() and not operands.empty())
+	{
+		output = operands.front();
+		operands.pop_front();
+	}
+	
+	if (hklin.empty() or (xyzin.empty() and (config.has("fomap") == false or config.has("dfmap") == false)))
+	{
+		usage();
 		exit(1);
 	}
 	
 	const std::set<std::string> kAnisoOptions{ "none", "calculated", "observed" };
-	if (vm.count("aniso-scaling") and kAnisoOptions.count(vm["aniso-scaling"].as<std::string>()) == 0)
+	if (config.has("aniso-scaling") and kAnisoOptions.count(config.get<std::string>("aniso-scaling")) == 0)
 	{
 		std::cerr << "Invalid option for aniso-scaling, allowed values are none, observed and calculated" << std::endl;
 		exit(1);
 	}
 	
-	if (vm.count("fomap") and (vm.count("reshi") == 0 or vm.count("reslo") == 0))
+	if (config.has("fomap") and (config.has("reshi") == false or config.has("reslo") == false))
 	{
 		std::cerr << "The reshi and reslo parameters are required when using std::map files" << std::endl;
 		exit(1);
 	}
 
-	cif::VERBOSE = vm.count("verbose") != 0;
-	if (vm.count("debug"))
-		cif::VERBOSE = vm["debug"].as<int>();
+	cif::VERBOSE = config.count("verbose");
 
 	// Load extra CCD definitions, if any
 
-	if (vm.count("compounds"))
-		cif::addFileResource("components.cif", vm["compounds"].as<std::string>());
-	else if (vm.count("components"))
-		cif::addFileResource("components.cif", vm["components"].as<std::string>());
+	if (config.has("compounds"))
+		cif::add_file_resource("components.cif", config.get<std::string>("compounds"));
 	
-	if (vm.count("extra-compounds"))
-		c::CompoundFactory::instance().pushDictionary(vm["extra-compounds"].as<std::string>());
+	if (config.has("extra-compounds"))
+		cif::compound_factory::instance().push_dictionary(config.get<std::string>("extra-compounds"));
 	
 	// And perhaps a private mmcif_pdbx dictionary
 
-	if (vm.count("mmcif-dictionary"))
-		cif::addFileResource("mmcif_pdbx_v50.dic", vm["mmcif-dictionary"].as<std::string>());
+	if (config.has("mmcif-dictionary"))
+		cif::add_file_resource("mmcif_pdbx.dic", config.get<std::string>("mmcif-dictionary"));
 
-	mmcif::File f(vm["xyzin"].as<std::string>());
-	mmcif::Structure structure(f);
+	gxrio::ifstream xyzinFile(xyzin);
+	if (not xyzinFile.is_open())
+		throw std::runtime_error("Could not open xyzin file");
 
-	bool electronScattering = vm.count("electron-scattering") > 0;
+	cif::file f = cif::pdb::read(xyzinFile);
+	cif::mm::structure structure(f);
+
+	if (f.empty())
+		throw std::runtime_error("Invalid or empty mmCIF file");
+
+	bool electronScattering = config.has("electron-scattering");
 	if (not electronScattering)
 	{
-		auto& exptl = f.data()["exptl"];
+		auto& exptl = f.front()["exptl"];
 		electronScattering = not exptl.empty() and exptl.front()["method"] == "ELECTRON CRYSTALLOGRAPHY";
 	}
 	
 	pdb_redo::MapMaker<float> mm;
 	
-	if (vm.count("hklin"))
+	if (not hklin.empty())
 	{
-		float samplingRate = vm["sampling-rate"].as<float>();
+		float samplingRate = config.get<float>("sampling-rate");
 	
-		if (vm.count("recalc"))
+		if (config.has("recalc"))
 		{
 			auto aniso = pdb_redo::MapMaker<float>::as_None;
-			if (vm.count("aniso-scaling"))
+			if (config.has("aniso-scaling"))
 			{
-				if (vm["aniso-scaling"].as<std::string>() == "observed")
+				if (config.get<std::string>("aniso-scaling") == "observed")
 					aniso = pdb_redo::MapMaker<float>::as_Observed;
-				else if (vm["aniso-scaling"].as<std::string>() == "calculated")
+				else if (config.get<std::string>("aniso-scaling") == "calculated")
 					aniso = pdb_redo::MapMaker<float>::as_Calculated;
 			}
 			
 			mm.calculate(
-				vm["hklin"].as<std::string>(), structure, vm.count("no-bulk"), aniso, samplingRate, electronScattering);
+				hklin, structure, config.has("no-bulk"), aniso, samplingRate, electronScattering);
 		}
 		else
-			mm.loadMTZ(vm["hklin"].as<std::string>(), samplingRate);
+			mm.loadMTZ(hklin, samplingRate);
 	}
 	else
 	{
-		float reshi = vm["reshi"].as<float>();
-		float reslo = vm["reslo"].as<float>();
+		float reshi = config.get<float>("reshi");
+		float reslo = config.get<float>("reslo");
 		
-		mm.loadMaps(vm["fomap"].as<std::string>(), vm["dfmap"].as<std::string>(), reshi, reslo);
+		mm.loadMaps(config.get<std::string>("dfmap"), config.get<std::string>("fomap"), reshi, reslo);
 	}
 	
 	std::vector<pdb_redo::ResidueStatistics> r;
 	
-	if (vm.count("no-edia"))
+	if (config.has("no-edia"))
 	{
 		pdb_redo::StatsCollector collector(mm, structure, electronScattering);
 		r = collector.collect();
 	}
 	else
 	{
-		mmcif::BondMap bm(structure);
+		pdb_redo::BondMap bm(structure.get_datablock());
 
 		pdb_redo::EDIAStatsCollector collector(mm, structure, electronScattering, bm);
 		r = collector.collect();
 	}
 
-	bool formatAsJSON = vm["output-format"].as<std::string>() == "json";
+	bool formatAsJSON = config.get<std::string>("output-format") == "json";
 
-	std::ofstream of;
-	io::filtering_stream<io::output> out;
+	std::unique_ptr<std::ostream> outFile;
+	std::streambuf *out_buffer;
 
-	if (vm.count("output"))
+	if (not output.empty())
 	{
-		fs::path output = vm["output"].as<std::string>();
+		outFile.reset(new gxrio::ofstream(output));
+		out_buffer = outFile->rdbuf();
 
-		of.open(output);
-		if (not of.is_open())
-		{
-			std::cerr << "Could not open output file" << std::endl;
-			exit(1);
-		}
-
-		if (output.extension() == ".gz")
-		{
-			out.push(io::gzip_compressor());
-			output = output.stem();
-		}
-
-		if (vm["output-format"].defaulted() and output.extension() == ".eds")
+		if (config.count("output-format") == 0 and output.extension() == ".eds")
 			formatAsJSON = false;
-		
-		out.push(of);
 	}
 	else
-		out.push(std::cout);
+		out_buffer = std::cout.rdbuf();
+
+	std::ostream out(out_buffer);
 
 	if (formatAsJSON)
 	{
@@ -247,7 +252,7 @@ int pr_main(int argc, char* argv[])
 		
 		for (auto i: r)
 		{
-			auto &res = structure.getResidue(i.asymID, i.seqID, i.authSeqID);
+			auto &res = structure.get_residue(i.asymID, i.seqID, i.authSeqID);
 
 			stats.emplace_back(object{
 				{ "asymID", i.asymID },
@@ -255,10 +260,10 @@ int pr_main(int argc, char* argv[])
 				{ "compID", i.compID },
 				{
 					"pdb", {
-						{ "strandID", res.authAsymID() },
+						{ "strandID", res.get_auth_asym_id() },
 						{ "seqNum", i.authSeqID.empty() ? 0 : stoi(i.authSeqID) },
 						{ "compID", i.compID },
-						{ "insCode", res.authInsCode() }
+						{ "insCode", res.get_pdb_ins_code() }
 					}
 				},
 				{ "RSR", i.RSR },
@@ -282,7 +287,7 @@ int pr_main(int argc, char* argv[])
 			<< "EDIAm" << '\t'
 			<< "OPIA" << std::endl;
 	
-		bool writeAuth = vm.count("use-auth-ids");
+		bool writeAuth = config.has("use-auth-ids");
 	
 		for (auto i: r)
 		{
@@ -290,9 +295,9 @@ int pr_main(int argc, char* argv[])
 			
 			if (writeAuth)
 			{
-				auto &res = structure.getResidue(i.asymID, i.seqID, i.authSeqID);
+				auto &res = structure.get_residue(i.asymID, i.seqID, i.authSeqID);
 
-				id = i.compID + '_' + res.authAsymID() + '_' + res.authSeqID() + res.authInsCode();
+				id = i.compID + '_' + res.get_auth_asym_id() + '_' + res.get_auth_seq_id() + res.get_pdb_ins_code();
 			}
 			else if (i.compID == "HOH")
 				id = i.compID + '_' + i.asymID + '_' + i.authSeqID;

@@ -1,12 +1,3 @@
 .vscode/
 .gdb_history
 build/
-**/*.mtz*
-**/*.eds
-**/*.out
-**/*.cif
-**/*.pdb*
-**/pdb*.ent*
-**/*.log
-**/*.map
-

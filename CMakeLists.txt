@@ -117,10 +117,10 @@ add_git_submodule(gxrio EXCLUDE_FROM_ALL)
 
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp
-	${density-fitness_RESOURCE})
+	${PROJECT_SOURCE_DIR}/src/main.cpp)
 
 if(USE_RSRC)
-	mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx_v50.dic)
+	mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
 endif()
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
@@ -129,6 +129,27 @@ target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libc
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${BIN_INSTALL_DIR}
 )
+
+# testing
+
+if(ENABLE_TESTING)
+	find_package(Boost COMPONENTS headers REQUIRED)
+
+	add_executable(unit-test
+		${PROJECT_SOURCE_DIR}/test/unit-test.cpp
+		${PROJECT_SOURCE_DIR}/src/density-fitness.cpp)
+
+	target_include_directories(unit-test PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR})
+
+	target_link_libraries(unit-test pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::headers)
+
+	add_test(NAME unit-test COMMAND $<TARGET_FILE:unit-test> -- ${CMAKE_SOURCE_DIR}/test)
+
+	if(USE_RSRC)
+		mrc_target_resources(unit-test ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
+	endif()
+endif()
+
 
 # manual
 

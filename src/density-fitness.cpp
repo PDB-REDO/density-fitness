@@ -40,13 +40,15 @@
 #include <pdb-redo/BondMap.hpp>
 #include <pdb-redo/Statistics.hpp>
 
+#include "density-fitness.hpp"
+
 #include "revision.hpp"
 
 namespace fs = std::filesystem;
 
 // --------------------------------------------------------------------
 
-int pr_main(int argc, char* argv[])
+int density_fitness_main(int argc, char* const argv[])
 {
 	auto &config = cfg::config::instance();
 
@@ -60,6 +62,7 @@ int pr_main(int argc, char* argv[])
 		cfg::make_option("help,h", "Display help message"),
 		cfg::make_option("version", "Print version"),
 		cfg::make_option("verbose,v", "Verbose output"),
+		cfg::make_option("quiet", "Do not print verbose output at all"),
 		cfg::make_option<std::string>("hklin", "mtz file"),
 		cfg::make_option<std::string>("xyzin", "coordinates file"),
 		cfg::make_option<std::string>("output,o", "Write output to this file instead of stdout"),
@@ -148,7 +151,10 @@ int pr_main(int argc, char* argv[])
 		exit(1);
 	}
 
-	cif::VERBOSE = config.count("verbose");
+	if (config.has("quiet"))
+		cif::VERBOSE = -1;
+	else
+		cif::VERBOSE = config.count("verbose");
 
 	// Load extra CCD definitions, if any
 
@@ -317,38 +323,3 @@ int pr_main(int argc, char* argv[])
 	
 	return 0;
 }
-
-// --------------------------------------------------------------------
-
-// recursively print exception whats:
-void print_what (const std::exception& e)
-{
-	std::cerr << e.what() << std::endl;
-	try
-	{
-		std::rethrow_if_nested(e);
-	}
-	catch (const std::exception& nested)
-	{
-		std::cerr << " >> ";
-		print_what(nested);
-	}
-}
-
-int main(int argc, char* argv[])
-{
-	int result = -1;
-	
-	try
-	{
-		result = pr_main(argc, argv);
-	}
-	catch (std::exception& ex)
-	{
-		print_what(ex);
-		exit(1);
-	}
-
-	return result;
-}
-

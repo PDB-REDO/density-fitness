@@ -150,7 +150,6 @@ if(ENABLE_TESTING)
 	endif()
 endif()
 
-
 # manual
 
 if(UNIX)

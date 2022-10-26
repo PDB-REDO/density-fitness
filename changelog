@@ -1,3 +1,6 @@
+Version 1.0.6
+- Based on new libcifpp
+
 Version 1.0.5
 - Depends on libpdb-redo version 3.0.1 to include fix for sample-rate
   when recalculating maps.

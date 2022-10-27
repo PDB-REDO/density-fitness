@@ -52,13 +52,8 @@ int density_fitness_main(int argc, char* const argv[])
 {
 	auto &config = cfg::config::instance();
 
-	auto usage = [argv,&config]()
-	{
-		std::cout << fs::path(argv[0]).filename().string() << " [options] <mtzfile> <coordinatesfile> [<output>]" << std::endl
-				  << config << std::endl;
-	};
-
 	config.init(
+		"usage: density-fitness [options] <mtzfile> <coordinatesfile> [<output>]",
 		cfg::make_option("help,h", "Display help message"),
 		cfg::make_option("version", "Print version"),
 		cfg::make_option("verbose,v", "Verbose output"),
@@ -95,7 +90,7 @@ int density_fitness_main(int argc, char* const argv[])
 
 	if (config.has("help"))
 	{
-		usage();
+		std::cout << config << std::endl;
 		return 0;
 	}
 
@@ -134,7 +129,7 @@ int density_fitness_main(int argc, char* const argv[])
 	
 	if (hklin.empty() or (xyzin.empty() and (config.has("fomap") == false or config.has("dfmap") == false)))
 	{
-		usage();
+		std::cout << config << std::endl;
 		exit(1);
 	}
 	

@@ -109,8 +109,8 @@ endif()
 
 # libraries
 find_package(zeep REQUIRED)
+find_package(libconfig REQUIRED)
 
-add_git_submodule(libconfig EXCLUDE_FROM_ALL)
 add_git_submodule(gxrio EXCLUDE_FROM_ALL)
 
 find_package(pdb-redo 3.0.1 REQUIRED)

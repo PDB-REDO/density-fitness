@@ -109,7 +109,6 @@ endif()
 
 # libraries
 find_package(zeep REQUIRED)
-find_package(libconfig REQUIRED)
 find_package(pdb-redo 3.0.1 REQUIRED)
 
 add_executable(density-fitness

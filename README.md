@@ -12,7 +12,7 @@ See the documentation for [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-red
 After that, density-fitness can be built as follows:
 
 
-```
+```bash
 git clone https://github.com/PDB-REDO/density-fitness.git
 cd density-fitness
 mkdir build

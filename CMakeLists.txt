@@ -109,7 +109,7 @@ endif()
 
 # libraries
 find_package(zeep REQUIRED)
-
+find_package(libconfig REQUIRED)
 find_package(pdb-redo 3.0.1 REQUIRED)
 
 add_executable(density-fitness
@@ -132,18 +132,18 @@ install(TARGETS ${PROJECT_NAME}
 if(ENABLE_TESTING)
 	find_package(Boost COMPONENTS headers REQUIRED)
 
-	add_executable(df-unit-test
-		${PROJECT_SOURCE_DIR}/test/df-unit-test.cpp
+	add_executable(unit-test-density-fitness
+		${PROJECT_SOURCE_DIR}/test/unit-test-density-fitness.cpp
 		${PROJECT_SOURCE_DIR}/src/density-fitness.cpp)
 
-	target_include_directories(df-unit-test PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR})
+	target_include_directories(unit-test-density-fitness PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR})
 
-	target_link_libraries(df-unit-test pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::headers)
+	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::headers)
 
-	add_test(NAME df-unit-test COMMAND $<TARGET_FILE:df-unit-test> -- ${CMAKE_SOURCE_DIR}/test)
+	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${CMAKE_SOURCE_DIR}/test)
 
 	if(USE_RSRC)
-		mrc_target_resources(df-unit-test ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
+		mrc_target_resources(unit-test-density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
 	endif()
 endif()
 

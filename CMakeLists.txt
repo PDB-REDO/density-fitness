@@ -104,7 +104,7 @@ if(USE_RSRC)
 	message("Using resources compiled with ${MRC_EXECUTABLE}")
 	add_compile_definitions(USE_RSRC)
 
-	mrc_write_header(${CMAKE_BINARY_DIR}/mrsrc.hpp)
+	mrc_write_header(${PROJECT_BINARY_DIR}/mrsrc.hpp)
 endif()
 
 # libraries
@@ -119,7 +119,7 @@ if(USE_RSRC)
 	mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
 endif()
 
-target_include_directories(density-fitness PRIVATE ${CMAKE_BINARY_DIR})
+target_include_directories(density-fitness PRIVATE ${PROJECT_BINARY_DIR})
 target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio)
 
 install(TARGETS ${PROJECT_NAME}
@@ -135,7 +135,7 @@ if(ENABLE_TESTING)
 		${PROJECT_SOURCE_DIR}/test/unit-test-density-fitness.cpp
 		${PROJECT_SOURCE_DIR}/src/density-fitness.cpp)
 
-	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${CMAKE_BINARY_DIR})
+	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
 	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::headers)
 

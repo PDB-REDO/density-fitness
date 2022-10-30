@@ -119,7 +119,7 @@ if(USE_RSRC)
 	mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
 endif()
 
-target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
+target_include_directories(density-fitness PRIVATE ${CMAKE_BINARY_DIR})
 target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio)
 
 install(TARGETS ${PROJECT_NAME}
@@ -135,14 +135,14 @@ if(ENABLE_TESTING)
 		${PROJECT_SOURCE_DIR}/test/unit-test-density-fitness.cpp
 		${PROJECT_SOURCE_DIR}/src/density-fitness.cpp)
 
-	target_include_directories(unit-test-density-fitness PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR})
+	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${CMAKE_BINARY_DIR})
 
 	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::headers)
 
-	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${CMAKE_SOURCE_DIR}/test)
+	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 
 	if(USE_RSRC)
-		mrc_target_resources(unit-test-density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
+		mrc_target_resources(unit-test-density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic ${CIFPP_SHARE_DIR}/mmcif_ddl.dic)
 	endif()
 endif()
 

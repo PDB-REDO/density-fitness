@@ -46,10 +46,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers")
 elseif(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 endif()
 
 option(CCP4 "The location where ccp4 is installed" "")
+
 if(DEFINED CCP4 AND EXISTS ${CCP4})
 	set(CLIBD ${CCP4}/lib/data)
 elseif(EXISTS $ENV{CCP4})
@@ -62,17 +63,18 @@ if(EXISTS "${CCP4}")
 
 	list(PREPEND CMAKE_MODULE_PATH "${CCP4}/Lib")
 	list(APPEND CMAKE_PREFIX_PATH ${CCP4})
+
 	if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 		set(CMAKE_INSTALL_PREFIX ${CCP4})
 	endif()
 endif()
 
 if(MSVC)
-    # make msvc standards compliant...
-    add_compile_options(/permissive-)
+	# make msvc standards compliant...
+	add_compile_options(/permissive-)
 
 	macro(get_WIN32_WINNT version)
-		if (WIN32 AND CMAKE_SYSTEM_VERSION)
+		if(WIN32 AND CMAKE_SYSTEM_VERSION)
 			set(ver ${CMAKE_SYSTEM_VERSION})
 			string(REPLACE "." "" ver ${ver})
 			string(REGEX REPLACE "([0-9])" "0\\1" ver ${ver})
@@ -108,8 +110,10 @@ if(USE_RSRC)
 endif()
 
 # libraries
-find_package(zeep REQUIRED)
-find_package(pdb-redo 3.0.1 REQUIRED)
+if(NOT PDB_REDO_META)
+	find_package(zeep REQUIRED)
+	find_package(pdb-redo 3.0.1 REQUIRED)
+endif()
 
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp
@@ -123,11 +127,10 @@ target_include_directories(density-fitness PRIVATE ${PROJECT_BINARY_DIR})
 target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio)
 
 install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
 )
 
 # testing
-
 if(ENABLE_TESTING)
 	find_package(Boost COMPONENTS headers REQUIRED)
 
@@ -147,7 +150,6 @@ if(ENABLE_TESTING)
 endif()
 
 # manual
-
 if(UNIX)
 	install(FILES doc/density-fitness.1
 		DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1)

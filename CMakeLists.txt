@@ -132,7 +132,7 @@ install(TARGETS ${PROJECT_NAME}
 
 # testing
 if(ENABLE_TESTING)
-	find_package(Boost COMPONENTS headers REQUIRED)
+	find_package(Boost REQUIRED)
 
 	add_executable(unit-test-density-fitness
 		${PROJECT_SOURCE_DIR}/test/unit-test-density-fitness.cpp
@@ -140,7 +140,7 @@ if(ENABLE_TESTING)
 
 	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
-	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::headers)
+	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::boost)
 
 	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 

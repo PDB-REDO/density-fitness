@@ -148,7 +148,8 @@ int density_fitness_main(int argc, char* const argv[])
 	// Load extra CCD definitions, if any
 
 	if (config.has("compounds"))
-		cif::add_file_resource("components.cif", config.get<std::string>("compounds"));
+		// cif::add_file_resource("components.cif", config.get<std::string>("compounds"));
+		cif::compound_factory::instance().push_dictionary(config.get<std::string>("compounds"));
 	
 	if (config.has("extra-compounds"))
 		cif::compound_factory::instance().push_dictionary(config.get<std::string>("extra-compounds"));

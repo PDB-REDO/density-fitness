@@ -25,7 +25,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 # set the project name
-project(density-fitness VERSION 1.0.6 LANGUAGES CXX)
+project(density-fitness VERSION 1.0.7 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -114,6 +114,7 @@ if(NOT PDB_REDO_META)
 	find_package(gxrio REQUIRED)
 	find_package(libconfig REQUIRED)
 	find_package(zeep REQUIRED)
+	find_package(newuoa REQUIRED)
 	find_package(pdb-redo 3.0.1 REQUIRED)
 endif()
 

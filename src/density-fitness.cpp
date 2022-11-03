@@ -127,7 +127,7 @@ int density_fitness_main(int argc, char* const argv[])
 		operands.pop_front();
 	}
 	
-	if (hklin.empty() or (xyzin.empty() and (config.has("fomap") == false or config.has("dfmap") == false)))
+	if (hklin.empty() and not (config.has("fomap") and config.has("dfmap")))
 	{
 		std::cout << config << std::endl;
 		exit(1);
@@ -140,12 +140,6 @@ int density_fitness_main(int argc, char* const argv[])
 		exit(1);
 	}
 	
-	if (config.has("fomap") and (config.has("reshi") == false or config.has("reslo") == false))
-	{
-		std::cerr << "The reshi and reslo parameters are required when using std::map files" << std::endl;
-		exit(1);
-	}
-
 	if (config.has("quiet"))
 		cif::VERBOSE = -1;
 	else
@@ -169,7 +163,10 @@ int density_fitness_main(int argc, char* const argv[])
 		throw std::runtime_error("Could not open xyzin file");
 
 	cif::file f = cif::pdb::read(xyzinFile);
-	cif::mm::structure structure(f);
+	auto &db = f.front();
+	auto entry_id = db["entry"].empty() ? db.name() : db["entry"].front().get<std::string>("id");
+
+	cif::mm::structure structure(f, 1, cif::mm::StructureOpenOptions::SkipHydrogen);
 
 	if (f.empty())
 		throw std::runtime_error("Invalid or empty mmCIF file");
@@ -206,8 +203,25 @@ int density_fitness_main(int argc, char* const argv[])
 	}
 	else
 	{
-		float reshi = config.get<float>("reshi");
-		float reslo = config.get<float>("reslo");
+		using namespace cif::literals;
+
+		float reshi;
+		float reslo;
+		auto f = db["reflns"].find1("entry_id"_key == entry_id);
+
+		if (config.has("reshi"))
+			reshi = config.get<float>("reshi");
+		else if (not f["d_resolution_high"].empty())
+			reshi = f["d_resolution_high"].as<float>();
+		else
+			throw std::runtime_error("missing high resolution");
+
+		if (config.has("reslo"))
+			reslo = config.get<float>("reslo");
+		else if (not f["d_resolution_low"].empty())
+			reslo = f["d_resolution_low"].as<float>();
+		else
+			throw std::runtime_error("missing low resolution");
 		
 		mm.loadMaps(config.get<std::string>("dfmap"), config.get<std::string>("fomap"), reshi, reslo);
 	}

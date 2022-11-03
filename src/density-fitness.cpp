@@ -74,8 +74,7 @@ int density_fitness_main(int argc, char* const argv[])
 		cfg::make_option("no-edia", "Skip EDIA score calculation"),
 		cfg::make_option("use-auth-ids", "Write auth_ identities instead of label_"),
 		cfg::make_option<std::string>("mmcif-dictionary", "Path to the mmcif_pdbx.dic file to use instead of default"),
-		cfg::make_option<std::string>("compounds", "Location of the components.cif file from CCD"),
-		cfg::make_option<std::string>("extra-compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
+		cfg::make_option<std::string>("compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
 	);
 
 	config.parse(argc, argv);
@@ -148,11 +147,7 @@ int density_fitness_main(int argc, char* const argv[])
 	// Load extra CCD definitions, if any
 
 	if (config.has("compounds"))
-		// cif::add_file_resource("components.cif", config.get<std::string>("compounds"));
 		cif::compound_factory::instance().push_dictionary(config.get<std::string>("compounds"));
-	
-	if (config.has("extra-compounds"))
-		cif::compound_factory::instance().push_dictionary(config.get<std::string>("extra-compounds"));
 	
 	// And perhaps a private mmcif_pdbx dictionary
 

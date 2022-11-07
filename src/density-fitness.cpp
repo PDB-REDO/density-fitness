@@ -74,6 +74,7 @@ int density_fitness_main(int argc, char* const argv[])
 		cfg::make_option("no-edia", "Skip EDIA score calculation"),
 		cfg::make_option("use-auth-ids", "Write auth_ identities instead of label_"),
 		cfg::make_option<std::string>("mmcif-dictionary", "Path to the mmcif_pdbx.dic file to use instead of default"),
+		cfg::make_option<std::string>("components", "Alternative components.cif file to use"),
 		cfg::make_option<std::string>("compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
 	);
 
@@ -145,6 +146,9 @@ int density_fitness_main(int argc, char* const argv[])
 		cif::VERBOSE = config.count("verbose");
 
 	// Load extra CCD definitions, if any
+
+	if (config.has("components"))
+		cif::compound_factory::instance().set_default_dictionary(config.get<std::string>("components"));
 
 	if (config.has("compounds"))
 		cif::compound_factory::instance().push_dictionary(config.get<std::string>("compounds"));

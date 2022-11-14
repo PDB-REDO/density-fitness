@@ -6,10 +6,10 @@
 # modification, are permitted provided that the following conditions are met:
 
 # 1. Redistributions of source code must retain the above copyright notice, this
-#    list of conditions and the following disclaimer
+# list of conditions and the following disclaimer
 # 2. Redistributions in binary form must reproduce the above copyright notice,
-#    this list of conditions and the following disclaimer in the documentation
-#    and/or other materials provided with the distribution.
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -37,7 +37,6 @@ include(CheckLibraryExists)
 include(CMakePackageConfigHelpers)
 include(Dart)
 include(GenerateExportHeader)
-include(AddGitSubmodule)
 
 set(CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
@@ -111,10 +110,13 @@ endif()
 
 # libraries
 if(NOT PDB_REDO_META)
-	find_package(gxrio REQUIRED)
-	find_package(libconfig REQUIRED)
+	find_package(libconfig QUIET)
+
+	if(NOT libconfig_FOUND)
+		add_subdirectory(libconfig EXCLUDE_FROM_ALL)
+	endif()
+
 	find_package(zeep REQUIRED)
-	find_package(newuoa REQUIRED)
 	find_package(pdb-redo 3.0.1 REQUIRED)
 endif()
 
@@ -127,7 +129,7 @@ if(USE_RSRC)
 endif()
 
 target_include_directories(density-fitness PRIVATE ${PROJECT_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio)
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libconfig)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
@@ -143,7 +145,7 @@ if(ENABLE_TESTING)
 
 	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
-	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::boost)
+	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libconfig::libconfig Boost::boost)
 
 	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 

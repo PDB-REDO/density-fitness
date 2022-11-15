@@ -35,7 +35,7 @@
 
 #include <zeep/json/element.hpp>
 #include <cfp/cfp.hpp>
-#include <gxrio.hpp>
+#include <cif++/gzio.hpp>
 
 #include <pdb-redo/BondMap.hpp>
 #include <pdb-redo/Statistics.hpp>
@@ -158,7 +158,7 @@ int density_fitness_main(int argc, char* const argv[])
 	if (config.has("mmcif-dictionary"))
 		cif::add_file_resource("mmcif_pdbx.dic", config.get<std::string>("mmcif-dictionary"));
 
-	gxrio::ifstream xyzinFile(xyzin);
+	cif::gzio::ifstream xyzinFile(xyzin);
 	if (not xyzinFile.is_open())
 		throw std::runtime_error("Could not open xyzin file");
 
@@ -248,7 +248,7 @@ int density_fitness_main(int argc, char* const argv[])
 
 	if (not output.empty())
 	{
-		outFile.reset(new gxrio::ofstream(output));
+		outFile.reset(new cif::gzio::ofstream(output));
 		out_buffer = outFile->rdbuf();
 
 		if (config.count("output-format") == 0 and output.extension() == ".eds")

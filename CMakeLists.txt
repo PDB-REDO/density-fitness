@@ -112,7 +112,7 @@ endif()
 # libraries
 if(NOT PDB_REDO_META)
 	find_package(gxrio REQUIRED)
-	find_package(libconfig REQUIRED)
+	find_package(libcfp REQUIRED)
 	find_package(zeep REQUIRED)
 	find_package(newuoa REQUIRED)
 	find_package(pdb-redo 3.0.1 REQUIRED)
@@ -127,7 +127,7 @@ if(USE_RSRC)
 endif()
 
 target_include_directories(density-fitness PRIVATE ${PROJECT_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio)
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libcfp::libcfp gxrio::gxrio)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
@@ -143,7 +143,7 @@ if(ENABLE_TESTING)
 
 	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
-	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::boost)
+	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libcfp::libcfp gxrio::gxrio Boost::boost)
 
 	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 

@@ -34,7 +34,7 @@
 #include <filesystem>
 
 #include <zeep/json/element.hpp>
-#include <cfp/cfp.hpp>
+#include <mcfp/mcfp.hpp>
 #include <cif++/gzio.hpp>
 
 #include <pdb-redo/BondMap.hpp>
@@ -50,32 +50,32 @@ namespace fs = std::filesystem;
 
 int density_fitness_main(int argc, char* const argv[])
 {
-	auto &config = cfp::config::instance();
+	auto &config = mcfp::config::instance();
 
 	config.init(
 		"usage: density-fitness [options] <mtzfile> <coordinatesfile> [<output>]",
-		cfp::make_option("help,h", "Display help message"),
-		cfp::make_option("version", "Print version"),
-		cfp::make_option("verbose,v", "Verbose output"),
-		cfp::make_option("quiet", "Do not print verbose output at all"),
-		cfp::make_option<std::string>("hklin", "mtz file"),
-		cfp::make_option<std::string>("xyzin", "coordinates file"),
-		cfp::make_option<std::string>("output,o", "Write output to this file instead of stdout"),
-		cfp::make_option<std::string>("output-format", "json", "Output format, can be either 'edstats' or 'json'"),
-		cfp::make_option("recalc", "Recalculate Fc from FP/SIGFP in mtz file"),
-		cfp::make_option<std::string>("aniso-scaling", "Anisotropic scaling (none/observed/calculated)"),
-		cfp::make_option("no-bulk", "No bulk correction"),
-		cfp::make_option<std::string>("fomap", "Fo map file -- 2mFo - DFc"),
-		cfp::make_option<std::string>("dfmap", "difference map file -- 2(mFo - DFc)"),
-		cfp::make_option<float>("reshi", "High resolution"),
-		cfp::make_option<float>("reslo", "Low resolution"),
-		cfp::make_option<float>("sampling-rate", 1.5f, "Sampling rate"),
-		cfp::make_option("electron-scattering", "Use electron scattering factors"),
-		cfp::make_option("no-edia", "Skip EDIA score calculation"),
-		cfp::make_option("use-auth-ids", "Write auth_ identities instead of label_"),
-		cfp::make_option<std::string>("mmcif-dictionary", "Path to the mmcif_pdbx.dic file to use instead of default"),
-		cfp::make_option<std::string>("components", "Alternative components.cif file to use"),
-		cfp::make_option<std::string>("compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
+		mcfp::make_option("help,h", "Display help message"),
+		mcfp::make_option("version", "Print version"),
+		mcfp::make_option("verbose,v", "Verbose output"),
+		mcfp::make_option("quiet", "Do not print verbose output at all"),
+		mcfp::make_option<std::string>("hklin", "mtz file"),
+		mcfp::make_option<std::string>("xyzin", "coordinates file"),
+		mcfp::make_option<std::string>("output,o", "Write output to this file instead of stdout"),
+		mcfp::make_option<std::string>("output-format", "json", "Output format, can be either 'edstats' or 'json'"),
+		mcfp::make_option("recalc", "Recalculate Fc from FP/SIGFP in mtz file"),
+		mcfp::make_option<std::string>("aniso-scaling", "Anisotropic scaling (none/observed/calculated)"),
+		mcfp::make_option("no-bulk", "No bulk correction"),
+		mcfp::make_option<std::string>("fomap", "Fo map file -- 2mFo - DFc"),
+		mcfp::make_option<std::string>("dfmap", "difference map file -- 2(mFo - DFc)"),
+		mcfp::make_option<float>("reshi", "High resolution"),
+		mcfp::make_option<float>("reslo", "Low resolution"),
+		mcfp::make_option<float>("sampling-rate", 1.5f, "Sampling rate"),
+		mcfp::make_option("electron-scattering", "Use electron scattering factors"),
+		mcfp::make_option("no-edia", "Skip EDIA score calculation"),
+		mcfp::make_option("use-auth-ids", "Write auth_ identities instead of label_"),
+		mcfp::make_option<std::string>("mmcif-dictionary", "Path to the mmcif_pdbx.dic file to use instead of default"),
+		mcfp::make_option<std::string>("components", "Alternative components.cif file to use"),
+		mcfp::make_option<std::string>("compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
 	);
 
 	config.parse(argc, argv);

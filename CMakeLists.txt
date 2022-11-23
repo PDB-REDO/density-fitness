@@ -100,17 +100,13 @@ else()
 endif()
 
 if(USE_RSRC)
-	set(USE_RSRC 1)
-
 	message("Using resources compiled with ${MRC_EXECUTABLE}")
-	add_compile_definitions(USE_RSRC)
-
 	mrc_write_header(${PROJECT_BINARY_DIR}/mrsrc.hpp)
 endif()
 
 # libraries
 if(NOT PDB_REDO_META)
-	find_package(libcfp REQUIRED)
+	find_package(libmcfp REQUIRED)
 	find_package(zeep REQUIRED)
 	find_package(pdb-redo 3.0.1 REQUIRED)
 endif()
@@ -120,11 +116,11 @@ add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/main.cpp)
 
 if(USE_RSRC)
-	mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
+	mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic ${CIFPP_SHARE_DIR}/mmcif_ddl.dic)
 endif()
 
 target_include_directories(density-fitness PRIVATE ${PROJECT_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libcfp::libcfp)
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo zeep::zeep libmcfp::libmcfp)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
@@ -140,7 +136,7 @@ if(ENABLE_TESTING)
 
 	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
-	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libcfp::libcfp Boost::boost)
+	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libmcfp::libmcfp zeep::zeep Boost::boost)
 
 	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 

@@ -226,9 +226,7 @@ int density_fitness_main(int argc, char* const argv[])
 	}
 	else
 	{
-		pdb_redo::BondMap bm(structure.get_datablock());
-
-		pdb_redo::EDIAStatsCollector collector(mm, structure, electronScattering, bm);
+		pdb_redo::EDIAStatsCollector collector(mm, structure, electronScattering);
 		r = collector.collect();
 	}
 

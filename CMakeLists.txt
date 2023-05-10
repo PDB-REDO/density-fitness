@@ -90,7 +90,7 @@ include(VersionString)
 write_version_header()
 
 # Optionally use mrc to create resources
-find_package(Mrc)
+find_package(Mrc QUIET)
 
 if(MRC_FOUND)
 	option(USE_RSRC "Use mrc to create resources" ON)
@@ -108,12 +108,12 @@ if(USE_RSRC)
 endif()
 
 # libraries
-find_package(zeep REQUIRED)
-
-find_package(pdb-redo 3.0.1 REQUIRED)
-
-add_git_submodule(libconfig EXCLUDE_FROM_ALL)
-add_git_submodule(gxrio EXCLUDE_FROM_ALL)
+if(NOT PDB_REDO_META)
+	find_package(Eigen3 REQUIRED)
+	find_package(libmcfp REQUIRED)
+	find_package(zeep REQUIRED)
+	find_package(pdb-redo 3.0.1 REQUIRED)
+endif()
 
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp

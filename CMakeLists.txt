@@ -113,6 +113,7 @@ if(NOT PDB_REDO_META)
 	find_package(libmcfp REQUIRED)
 	find_package(zeep REQUIRED)
 	find_package(pdb-redo 3.0.1 REQUIRED)
+	find_package(gxrio REQUIRED)
 endif()
 
 add_executable(density-fitness
@@ -124,7 +125,7 @@ if(USE_RSRC)
 endif()
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio)
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libmcfp::libmcfp gxrio::gxrio zeep::zeep)
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${BIN_INSTALL_DIR}
@@ -141,7 +142,7 @@ if(ENABLE_TESTING)
 
 	target_include_directories(unit-test PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR})
 
-	target_link_libraries(unit-test pdb-redo::pdb-redo libconfig::libconfig gxrio::gxrio Boost::headers)
+	target_link_libraries(unit-test pdb-redo::pdb-redo libmcfp::libmcfp gxrio::gxrio zeep::zeep Boost::headers)
 
 	add_test(NAME unit-test COMMAND $<TARGET_FILE:unit-test> -- ${CMAKE_SOURCE_DIR}/test)
 

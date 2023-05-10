@@ -34,7 +34,7 @@
 #include <filesystem>
 
 #include <zeep/json/element.hpp>
-#include <cfg.hpp>
+#include <mcfp.hpp>
 #include <gxrio.hpp>
 
 #include <pdb-redo/BondMap.hpp>
@@ -50,37 +50,32 @@ namespace fs = std::filesystem;
 
 int density_fitness_main(int argc, char* const argv[])
 {
-	auto &config = cfg::config::instance();
-
-	auto usage = [argv,&config]()
-	{
-		std::cout << fs::path(argv[0]).filename().string() << " [options] <mtzfile> <coordinatesfile> [<output>]" << std::endl
-				  << config << std::endl;
-	};
+	auto &config = mcfp::config::instance();
 
 	config.init(
-		cfg::make_option("help,h", "Display help message"),
-		cfg::make_option("version", "Print version"),
-		cfg::make_option("verbose,v", "Verbose output"),
-		cfg::make_option("quiet", "Do not print verbose output at all"),
-		cfg::make_option<std::string>("hklin", "mtz file"),
-		cfg::make_option<std::string>("xyzin", "coordinates file"),
-		cfg::make_option<std::string>("output,o", "Write output to this file instead of stdout"),
-		cfg::make_option<std::string>("output-format", "json", "Output format, can be either 'edstats' or 'json'"),
-		cfg::make_option("recalc", "Recalculate Fc from FP/SIGFP in mtz file"),
-		cfg::make_option<std::string>("aniso-scaling", "Anisotropic scaling (none/observed/calculated)"),
-		cfg::make_option("no-bulk", "No bulk correction"),
-		cfg::make_option<std::string>("fomap", "Fo map file -- 2mFo - DFc"),
-		cfg::make_option<std::string>("dfmap", "difference map file -- 2(mFo - DFc)"),
-		cfg::make_option<float>("reshi", "High resolution"),
-		cfg::make_option<float>("reslo", "Low resolution"),
-		cfg::make_option<float>("sampling-rate", 1.5f, "Sampling rate"),
-		cfg::make_option("electron-scattering", "Use electron scattering factors"),
-		cfg::make_option("no-edia", "Skip EDIA score calculation"),
-		cfg::make_option("use-auth-ids", "Write auth_ identities instead of label_"),
-		cfg::make_option<std::string>("mmcif-dictionary", "Path to the mmcif_pdbx.dic file to use instead of default"),
-		cfg::make_option<std::string>("compounds", "Location of the components.cif file from CCD"),
-		cfg::make_option<std::string>("extra-compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
+		"density-fitness [options] <mtzfile> <coordinatesfile> [<output>]",
+		mcfp::make_option("help,h", "Display help message"),
+		mcfp::make_option("version", "Print version"),
+		mcfp::make_option("verbose,v", "Verbose output"),
+		mcfp::make_option("quiet", "Do not print verbose output at all"),
+		mcfp::make_option<std::string>("hklin", "mtz file"),
+		mcfp::make_option<std::string>("xyzin", "coordinates file"),
+		mcfp::make_option<std::string>("output,o", "Write output to this file instead of stdout"),
+		mcfp::make_option<std::string>("output-format", "json", "Output format, can be either 'edstats' or 'json'"),
+		mcfp::make_option("recalc", "Recalculate Fc from FP/SIGFP in mtz file"),
+		mcfp::make_option<std::string>("aniso-scaling", "Anisotropic scaling (none/observed/calculated)"),
+		mcfp::make_option("no-bulk", "No bulk correction"),
+		mcfp::make_option<std::string>("fomap", "Fo map file -- 2mFo - DFc"),
+		mcfp::make_option<std::string>("dfmap", "difference map file -- 2(mFo - DFc)"),
+		mcfp::make_option<float>("reshi", "High resolution"),
+		mcfp::make_option<float>("reslo", "Low resolution"),
+		mcfp::make_option<float>("sampling-rate", 1.5f, "Sampling rate"),
+		mcfp::make_option("electron-scattering", "Use electron scattering factors"),
+		mcfp::make_option("no-edia", "Skip EDIA score calculation"),
+		mcfp::make_option("use-auth-ids", "Write auth_ identities instead of label_"),
+		mcfp::make_option<std::string>("mmcif-dictionary", "Path to the mmcif_pdbx.dic file to use instead of default"),
+		mcfp::make_option<std::string>("compounds", "Location of the components.cif file from CCD"),
+		mcfp::make_option<std::string>("extra-compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
 	);
 
 	config.parse(argc, argv);
@@ -95,7 +90,7 @@ int density_fitness_main(int argc, char* const argv[])
 
 	if (config.has("help"))
 	{
-		usage();
+		std::cout << config << std::endl;
 		return 0;
 	}
 
@@ -134,7 +129,7 @@ int density_fitness_main(int argc, char* const argv[])
 	
 	if (hklin.empty() or (xyzin.empty() and (config.has("fomap") == false or config.has("dfmap") == false)))
 	{
-		usage();
+		std::cout << config << std::endl;
 		exit(1);
 	}
 	

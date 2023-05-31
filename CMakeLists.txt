@@ -138,7 +138,7 @@ if(ENABLE_TESTING)
 
 	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
-	target_link_libraries(unit-test pdb-redo::pdb-redo libmcfp::libmcfp gxrio::gxrio zeep::zeep Boost::headers)
+	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libmcfp::libmcfp gxrio::gxrio zeep::zeep Boost::headers)
 
 	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 

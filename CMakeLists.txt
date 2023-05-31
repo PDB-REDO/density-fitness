@@ -91,7 +91,7 @@ include(VersionString)
 write_version_header()
 
 # Optionally use mrc to create resources
-find_package(Mrc)
+find_package(Mrc QUIET)
 
 if(MRC_FOUND)
 	option(USE_RSRC "Use mrc to create resources" ON)
@@ -106,9 +106,11 @@ endif()
 
 # libraries
 if(NOT PDB_REDO_META)
+	find_package(Eigen3 REQUIRED)
 	find_package(libmcfp REQUIRED)
 	find_package(zeep REQUIRED)
 	find_package(pdb-redo 3.0.1 REQUIRED)
+	find_package(gxrio REQUIRED)
 endif()
 
 add_executable(density-fitness
@@ -119,8 +121,8 @@ if(USE_RSRC)
 	mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic ${CIFPP_SHARE_DIR}/mmcif_ddl.dic)
 endif()
 
-target_include_directories(density-fitness PRIVATE ${PROJECT_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo zeep::zeep libmcfp::libmcfp)
+target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libmcfp::libmcfp gxrio::gxrio zeep::zeep)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
@@ -136,7 +138,7 @@ if(ENABLE_TESTING)
 
 	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
-	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libmcfp::libmcfp zeep::zeep Boost::boost)
+	target_link_libraries(unit-test pdb-redo::pdb-redo libmcfp::libmcfp gxrio::gxrio zeep::zeep Boost::headers)
 
 	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 

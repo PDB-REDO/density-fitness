@@ -34,7 +34,7 @@
 #include <filesystem>
 
 #include <zeep/json/element.hpp>
-#include <mcfp/mcfp.hpp>
+#include <mcfp.hpp>
 #include <cif++/gzio.hpp>
 
 #include <pdb-redo/BondMap.hpp>
@@ -53,7 +53,7 @@ int density_fitness_main(int argc, char* const argv[])
 	auto &config = mcfp::config::instance();
 
 	config.init(
-		"usage: density-fitness [options] <mtzfile> <coordinatesfile> [<output>]",
+		"density-fitness [options] <mtzfile> <coordinatesfile> [<output>]",
 		mcfp::make_option("help,h", "Display help message"),
 		mcfp::make_option("version", "Print version"),
 		mcfp::make_option("verbose,v", "Verbose output"),
@@ -74,8 +74,8 @@ int density_fitness_main(int argc, char* const argv[])
 		mcfp::make_option("no-edia", "Skip EDIA score calculation"),
 		mcfp::make_option("use-auth-ids", "Write auth_ identities instead of label_"),
 		mcfp::make_option<std::string>("mmcif-dictionary", "Path to the mmcif_pdbx.dic file to use instead of default"),
-		mcfp::make_option<std::string>("components", "Alternative components.cif file to use"),
-		mcfp::make_option<std::string>("compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
+		mcfp::make_option<std::string>("compounds", "Location of the components.cif file from CCD"),
+		mcfp::make_option<std::string>("extra-compounds", "File containing residue information for extra compounds in this specific target, should be either in CCD format or a CCP4 restraints file")
 	);
 
 	config.parse(argc, argv);
@@ -235,9 +235,7 @@ int density_fitness_main(int argc, char* const argv[])
 	}
 	else
 	{
-		pdb_redo::BondMap bm(structure.get_datablock());
-
-		pdb_redo::EDIAStatsCollector collector(mm, structure, electronScattering, bm);
+		pdb_redo::EDIAStatsCollector collector(mm, structure, electronScattering);
 		r = collector.collect();
 	}
 

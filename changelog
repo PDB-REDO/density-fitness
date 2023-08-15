@@ -1,3 +1,7 @@
+Version 1.0.10
+- New version string
+- Clean up makefile
+
 Version 1.0.9
 - Maintenance release for new libraries and such
 

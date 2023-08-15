@@ -39,6 +39,7 @@
 
 #include <pdb-redo/BondMap.hpp>
 #include <pdb-redo/Statistics.hpp>
+#include <pdb-redo/Version.hpp>
 
 #include "density-fitness.hpp"
 
@@ -50,6 +51,9 @@ namespace fs = std::filesystem;
 
 int density_fitness_main(int argc, char* const argv[])
 {
+	// this kinda sucks...
+	pdb_redo::force_link = 1;
+
 	auto &config = mcfp::config::instance();
 
 	config.init(

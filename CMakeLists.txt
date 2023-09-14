@@ -35,8 +35,8 @@ include(CheckIncludeFile)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
 include(CMakePackageConfigHelpers)
-include(Dart)
 include(GenerateExportHeader)
+include(CTest)
 
 set(CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
@@ -128,7 +128,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # testing
-if(ENABLE_TESTING)
+if(BUILD_TESTING)
 	find_package(Boost REQUIRED)
 
 	add_executable(unit-test-density-fitness

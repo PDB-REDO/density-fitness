@@ -1,0 +1,11 @@
+--- fftw.h      2023-11-07 09:54:43.603269023 +0100
++++ fftw.h.in   2023-11-07 09:54:01.339149662 +0100
+@@ -36,7 +36,7 @@
+  * If you can, use configure --enable-float instead of changing this
+  * flag directly
+  */
+-#undef FFTW_ENABLE_FLOAT
++#define FFTW_ENABLE_FLOAT 1
+
+ /* our real numbers */
+ #ifdef FFTW_ENABLE_FLOAT

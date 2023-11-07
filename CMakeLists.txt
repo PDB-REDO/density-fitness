@@ -24,6 +24,14 @@
 
 cmake_minimum_required(VERSION 3.15)
 
+option(BUILD_LOCAL_DEPENDENCIES "Use this option to build all dependencies locally" OFF)
+
+if(BUILD_LOCAL_DEPENDENCIES)
+	project(dependency_build NONE)
+	include(cmake/dependencies.cmake)
+	return()
+endif()
+
 # set the project name
 project(density-fitness VERSION 1.0.11 LANGUAGES CXX)
 

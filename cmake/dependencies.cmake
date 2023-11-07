@@ -78,7 +78,7 @@ ExternalProject_Add(
 	CONFIGURE_COMMAND ${CMAKE_COMMAND}
 		-E env CPPFLAGS=-I${CMAKE_CURRENT_BINARY_DIR}/external/include
 		LDFLAGS=-L${CMAKE_CURRENT_BINARY_DIR}/external/lib
-		<SOURCE_DIR>/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/external --enable-ccp4 --enable-cif
+		<SOURCE_DIR>/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/external --enable-ccp4
 	BUILD_COMMAND ${MAKE_EXE}
 )
 
@@ -111,7 +111,7 @@ ExternalProject_Add(
 
 ExternalProject_Add(
 	libpdb-redo
-	DEPENDS libcifpp newuoa
+	DEPENDS libcifpp newuoa clipper
 	GIT_REPOSITORY https://github.com/PDB-REDO/libpdb-redo.git
 	GIT_TAG trunk
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external -DBUILD_TESTING=OFF -DBUILD_MINIMIZER=OFF

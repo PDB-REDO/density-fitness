@@ -158,7 +158,8 @@ ExternalProject_Add(density-fitness
 	DEPENDS libzeep libpdb-redo libmcfp
 	GIT_REPOSITORY https://github.com/pdb-redo/density-fitness
 	GIT_TAG trunk
-	CMAKE_ARGS -DBUILD_LOCAL_DEPENDENCIES=OFF -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external
+	CMAKE_ARGS
+		-DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external
 		-DCIFPP_SHARE_DIR=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/libcifpp/rsrc
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 	BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/density-fitness)

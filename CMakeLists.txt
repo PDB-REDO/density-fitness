@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.24)
 
 # set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES cmake/provider.cmake)
 
-project(density-fitness-builder VERSION 1.0.0)
+project(density-fitness-builder VERSION 1.0.0 LANGUAGES CXX)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND ${CMAKE_CXX_COMPILER_VERSION} LESS 9.4)
+	message(FATAL_ERROR "You are using a GNU GCC compiler that is too old")
+endif()
 
 include(ExternalProject)
 
@@ -22,7 +26,7 @@ ExternalProject_Add(
 ExternalProject_Add(
 	libmcfp
 	GIT_REPOSITORY https://github.com/mhekkel/libmcfp
-	GIT_TAG v1.2.4
+	GIT_TAG trunk
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
 )
 
@@ -30,7 +34,7 @@ ExternalProject_Add(
 	mrc
 	DEPENDS libmcfp
 	GIT_REPOSITORY https://github.com/mhekkel/mrc
-	GIT_TAG v1.3.10
+	GIT_TAG trunk
 	CMAKE_ARGS -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
 )
 

@@ -22,14 +22,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.24)
 
 option(BUILD_LOCAL_DEPENDENCIES "Use this option to build all dependencies locally" OFF)
 
 if(BUILD_LOCAL_DEPENDENCIES)
-	project(dependency_build NONE)
-	include(cmake/dependencies.cmake)
-	return()
+	set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES cmake/provider.cmake)
 endif()
 
 # set the project name

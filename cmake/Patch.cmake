@@ -1,5 +1,3 @@
-# This file comes from https://github.com/scivision/mumps
-#
 # use GNU Patch from any platform
 #
 # Functions

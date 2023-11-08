@@ -26,11 +26,11 @@ cmake_minimum_required(VERSION 3.15)
 
 option(BUILD_LOCAL_DEPENDENCIES "Use this option to build all dependencies locally" OFF)
 
-if(BUILD_LOCAL_DEPENDENCIES)
-	project(dependency_build NONE)
-	include(cmake/dependencies.cmake)
-	return()
-endif()
+# if(BUILD_LOCAL_DEPENDENCIES)
+# 	project(dependency_build NONE)
+# 	include(cmake/dependencies.cmake)
+# 	return()
+# endif()
 
 # set the project name
 project(density-fitness VERSION 1.0.11 LANGUAGES CXX)
@@ -125,13 +125,31 @@ add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/main.cpp)
 
 if(USE_RSRC)
-	mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic ${CIFPP_SHARE_DIR}/mmcif_ddl.dic)
+	if(EXISTS ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
+		set(DIC_RSRC ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
+	else()
+		# Oh, well, lets keep this simple, there's no CIFPP_SHARE_DIR (yet) so we simply download the latest dictionary and use that
+		set(MMCIF_PDBX_DIC ${PROJECT_SOURCE_DIR}/data/mmcif_pdbx.cif)
+
+		if(NOT EXISTS ${MMCIF_PDBX_DIC})
+			if(NOT EXISTS ${PROJECT_SOURCE_DIR}/data)
+				file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/data/)
+			endif()
+
+			file(DOWNLOAD https://mmcif.wwpdb.org/dictionaries/ascii/mmcif_pdbx_v50.dic ${MMCIF_PDBX_DIC} SHOW_PROGRESS)
+		endif()
+
+		add_custom_target(COMPONENTS ALL DEPENDS ${MMCIF_PDBX_DIC})
+
+		set(DIC_RSRC ${MMCIF_PDBX_DIC})
+	endif()
+	mrc_target_resources(density-fitness ${DIC_RSRC})
 endif()
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
 target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libmcfp::libmcfp zeep::zeep)
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS density-fitness
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
 )
 
@@ -150,7 +168,7 @@ if(BUILD_TESTING)
 	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 
 	if(USE_RSRC)
-		mrc_target_resources(unit-test-density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic ${CIFPP_SHARE_DIR}/mmcif_ddl.dic)
+		mrc_target_resources(unit-test-density-fitness ${DIC_RSRC})
 	endif()
 endif()
 

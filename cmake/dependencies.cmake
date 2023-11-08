@@ -93,13 +93,14 @@ ExternalProject_Add(
 	libcifpp
 	DEPENDS Eigen3 boost
 	GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git
-	GIT_TAG v5.2.4
+	GIT_TAG trunk
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
-		-DCIFPP_CACHE_DIR=/tmp/var/cache/libcifpp
-		-DCIFPP_DATA_DIR=/tmp/usr/share/libcifpp
+		-DCIFPP_CACHE_DIR=/var/cache/libcifpp
+		-DCIFPP_DATA_DIR=/usr/share/libcifpp
 		-DBUILD_TESTING=OFF
 		-DCIFPP_DOWNLOAD_CCD=OFF
 		-DCIFPP_INSTALL_UPDATE_SCRIPT=OFF
+		-DWRITE_DATA_FILES=OFF
 )
 
 ExternalProject_Add(
@@ -140,5 +141,4 @@ ExternalProject_Add(density-fitness
 	DEPENDS libzeep libpdb-redo libmcfp
 	SOURCE_DIR ${PROJECT_SOURCE_DIR}
 	CMAKE_ARGS -DBUILD_LOCAL_DEPENDENCIES=OFF -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external
-	INSTALL_COMMAND ""
 	BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/density-fitness)

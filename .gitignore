@@ -4,3 +4,4 @@ build/
 test/
 src/revision.hpp
 
+data/mmcif_pdbx.cif

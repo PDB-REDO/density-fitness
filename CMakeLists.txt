@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.20)
 
 # set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES cmake/provider.cmake)
 
@@ -160,4 +160,5 @@ ExternalProject_Add(density-fitness
 	GIT_TAG trunk
 	CMAKE_ARGS -DBUILD_LOCAL_DEPENDENCIES=OFF -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external
 		-DCIFPP_SHARE_DIR=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/libcifpp/rsrc
+		-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 	BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/density-fitness)

@@ -10,7 +10,7 @@ include(ExternalProject)
 
 set_property(DIRECTORY PROPERTY EP_BASE Dependencies)
 
-find_package(Boost COMPONENTS headers QUIET)
+find_package(Boost 1.74 COMPONENTS headers QUIET)
 
 if(NOT Boost_FOUND)
 	ExternalProject_Add(
@@ -26,7 +26,7 @@ if(NOT Boost_FOUND)
 	set(BOOST_D local_boost)
 endif()
 
-find_package(libmcfp QUIET)
+find_package(libmcfp 1.2.4 QUIET)
 
 if(NOT libmcfp_FOUND)
 	ExternalProject_Add(
@@ -204,7 +204,7 @@ find_package(Git REQUIRED)
 
 set(DF_TRUNK_SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/density-fitness)
 
-if(EXISTS ${DF_TRUNK_SOURCE_DIR})
+if(EXISTS ${DF_TRUNK_SOURCE_DIR}/.git)
 	execute_process(
 		COMMAND ${CMAKE_COMMAND} -E env ${GIT_EXECUTABLE} pull
 		WORKING_DIRECTORY ${DF_TRUNK_SOURCE_DIR}
@@ -212,6 +212,7 @@ if(EXISTS ${DF_TRUNK_SOURCE_DIR})
 	)
 else()
 	execute_process(
+		COMMAND ${CMAKE_COMMAND} -E remove_directory ${DF_TRUNK_SOURCE_DIR}
 		COMMAND ${CMAKE_COMMAND} -E env ${GIT_EXECUTABLE} clone file://${CMAKE_CURRENT_SOURCE_DIR}/ ${DF_TRUNK_SOURCE_DIR} -b trunk
 		COMMAND_ECHO STDOUT
 	)

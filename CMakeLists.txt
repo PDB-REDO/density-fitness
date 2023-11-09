@@ -195,7 +195,7 @@ if(NOT zeep_FOUND)
 		-DBUILD_TESTING=OFF
 	)
 
-	ExternalProject_Add_StepDependencies(libzeep build ${BOOST_D} date)
+	ExternalProject_Add_StepDependencies(local_libzeep build ${BOOST_D} date)
 
 	set(ZEEP_D local_libzeep)
 endif()

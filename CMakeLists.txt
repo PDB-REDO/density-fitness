@@ -149,7 +149,7 @@ if(NOT cifpp_FOUND)
 	)
 
 	set(CIFPP_D local_cifpp)
-	set(CIFPP_SHARE_DIR ${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/local_libcifpp/rsrc)
+	set(CIFPP_SHARE_DIR ${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/local_cifpp/rsrc)
 endif()
 
 find_package(pdb-redo 3.0.1 QUIET)

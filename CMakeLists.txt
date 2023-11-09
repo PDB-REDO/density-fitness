@@ -231,8 +231,8 @@ ExternalProject_Add(density-fitness
 	INSTALL_COMMAND ""
 	BINARY_DIR ${DF_TRUNK_SOURCE_DIR})
 
-install(CODE [[
+install(CODE "
 	execute_process(COMMAND ${CMAKE_COMMAND}
 		-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 		-P ${CMAKE_CURRENT_BINARY_DIR}/density-fitness/cmake_install.cmake)
-]])
+")

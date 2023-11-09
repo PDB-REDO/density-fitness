@@ -7,12 +7,25 @@ of programs.
 Installation
 ------------
 
-See the documentation for [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-redo) on installing all prerequisites.
+The easiest way to build and install density-fitness is by using the builder script, this is a CMake file that will build all missing dependencies automatically. Use it like this:
+
+```console
+git clone https://github.com/PDB-REDO/density-fitness.git -b density-fitness-builder
+cd density-fitness
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/.local
+cmake --build build
+cmake --install build
+```
+
+Those commands will create an executable and install it in $HOME/.local. You can specify any other path here of course.
+
+Please note that density-fitness built this way still requires a CCD components.cif file. This file should be located in '/usr/share/libcifpp/' or '/var/cache/libcifpp/'. You can of course also provide your own version of this file using the command line argumentsn (See [options](#options) below).
+
+If you want to install the classic way, you have to install all dependencies first. See the documentation for [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-redo) on installing all prerequisites.
 
 After that, density-fitness can be built as follows:
 
-
-```bash
+```console
 git clone https://github.com/PDB-REDO/density-fitness.git
 cd density-fitness
 mkdir build

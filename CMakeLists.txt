@@ -31,6 +31,7 @@ find_package(libmcfp 1.2.4 QUIET)
 if(NOT libmcfp_FOUND)
 	ExternalProject_Add(
 		local_libmcfp
+		DEPENDS ${BOOST_D}
 		GIT_REPOSITORY https://github.com/mhekkel/libmcfp
 		GIT_TAG trunk
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external

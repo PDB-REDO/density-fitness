@@ -20,10 +20,11 @@ if(NOT Boost_FOUND)
 		DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
 		BUILD_IN_SOURCE 1
 		CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=headers --prefix=${CMAKE_CURRENT_BINARY_DIR}/external
-		BUILD_COMMAND ""
-		INSTALL_COMMAND ./b2 install
+		BUILD_COMMAND ./b2 stage
+		INSTALL_COMMAND ""
 	)
 	set(BOOST_D local_boost)
+	set(BOOST_ROOT ${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/local_boost)
 endif()
 
 find_package(libmcfp 1.2.4 QUIET)

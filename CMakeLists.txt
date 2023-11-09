@@ -124,35 +124,37 @@ if(NOT Eigen3_FOUND)
 	set(EIGEN3_D local_Eigen3)
 endif()
 
+find_package(cifpp 5 QUIET)
+
+if(NOT cifpp_FOUND)
+	ExternalProject_Add(
+		zlib-dev
+		URL https://www.zlib.net/zlib-1.3.tar.gz
+		URL_HASH SHA1=04d053e4d4064a0fb8f0cbd127f0bfb5fe4eb554
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
+	)
+
+	ExternalProject_Add(
+		local_cifpp
+		DEPENDS ${EIGEN3_D} ${BOOST_D} zlib-dev
+		GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git
+		GIT_TAG trunk
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
+		-DCIFPP_CACHE_DIR=/var/cache/libcifpp
+		-DCIFPP_DATA_DIR=/usr/share/libcifpp
+		-DBUILD_TESTING=OFF
+		-DCIFPP_DOWNLOAD_CCD=OFF
+		-DCIFPP_INSTALL_UPDATE_SCRIPT=OFF
+		-DWRITE_DATA_FILES=OFF
+	)
+
+	set(CIFPP_D local_cifpp)
+	set(CIFPP_SHARE_DIR ${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/local_libcifpp/rsrc)
+endif()
+
 find_package(pdb-redo 3.0.1 QUIET)
 
 if(NOT pdb-redo_FOUND)
-	find_package(cifpp 5 QUIET)
-
-	if(NOT cifpp_FOUND)
-		ExternalProject_Add(
-			zlib-dev
-			URL https://www.zlib.net/zlib-1.3.tar.gz
-			URL_HASH SHA1=04d053e4d4064a0fb8f0cbd127f0bfb5fe4eb554
-			CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
-		)
-
-		ExternalProject_Add(
-			local_cifpp
-			DEPENDS ${EIGEN3_D} ${BOOST_D} zlib-dev
-			GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git
-			GIT_TAG trunk
-			CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
-			-DCIFPP_CACHE_DIR=/var/cache/libcifpp
-			-DCIFPP_DATA_DIR=/usr/share/libcifpp
-			-DBUILD_TESTING=OFF
-			-DCIFPP_DOWNLOAD_CCD=OFF
-			-DCIFPP_INSTALL_UPDATE_SCRIPT=OFF
-			-DWRITE_DATA_FILES=OFF
-		)
-
-		set(CIFPP_D local_cifpp)
-	endif()
 
 	find_package(newuoa QUIET)
 
@@ -219,13 +221,12 @@ else()
 	)
 endif()
 
-
 ExternalProject_Add(density-fitness
 	DEPENDS ${ZEEP_D} ${PDB_REDO_D} ${LIBMCFP_D}
 	SOURCE_DIR ${DF_TRUNK_SOURCE_DIR}
 	CMAKE_ARGS
 	-DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external
-	-DCIFPP_SHARE_DIR=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/libcifpp/rsrc
+	-DCIFPP_SHARE_DIR=${CIFPP_SHARE_DIR}
 	-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 	INSTALL_COMMAND ""
 	BINARY_DIR ${DF_TRUNK_SOURCE_DIR})

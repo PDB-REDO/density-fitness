@@ -104,42 +104,57 @@ If no output file is given, the result is printed to _stdout_.
 When using map files, the resolution **must** be specified using the
 _reshi_ and _reslo_ options.
 
-* **--xyzin**
-  The coordinates file in either PDB or mmCIF format. This file may be compressed
-  with gzip or bzip2.
-  **--fomap** and **--dfmap**
-  The _2mFo-DFc_ and _mFo-DFc_ map files respectively. Both are required
-  and if these are specified, the resolution **must** also be specified.
-* **--reslo** and **--reshi**
-  The low and high resolution for the specied map files.
-* **--hklin**
-  The MTZ file. If this option is specified, the maps will be calculated using
-  the information in this file.
-* **--sampling-rate**
+* **xyzin**
+  The coordinates file in either PDB or mmCIF format. This file may be compressed with gzip.  --fomap and --dfmap
+  The 2mFo-DFc and mFo-DFc map files respectively. Both are required and if these are specified, the resolution
+  must also be specified.
+
+* **reslo and --reshi**
+  The low and high resolution for the specified map files.
+
+* **hklin**
+  The MTZ file. If this option is specified, the maps will be calculated using the information in this file.
+
+* **sampling-rate**
   The sampling rate to use when creating maps. Default is 1.5.
-* **--recalc**
-  By default the maps are read from the MTZ file, but you can also opt to
-  recalculate the maps, e.g. when the structure no longer corresponds to
-  the structure used to calculate the maps in the MTZ file.
-* **--aniso-scaling**
-  Accepted values for this option are _observed_ and _calculated_ or _none_.
-  Used when recalculating maps.
-* **--no-bulk**
+
+* **recalc**
+  By default the maps are read from the MTZ file, but you can also opt to recalculate the maps, e.g. when the
+  structure no longer corresponds to the structure used to calculate the maps in the MTZ file.
+
+* **aniso-scaling**
+  Accepted values for this option are observed and calculated or none.  Used when recalculating maps.
+
+* **no-bulk**
   When specified, a bulk solvent mask is not used in recalculating the maps.
-* **--dict**=&lt;file&gt;
-  Dictionary file containing restraints for residues in this specific target.
-* **--no-validate**
-  Omit the validation of the input mmCIF file. This will force output even in
-  case the input file contains errors.
-* **--electron-scattering**
+
+* **components (or --compounds)**
+  Specify the path of the CCD file components.cif. By default the one installed by libcifpp is used, use this
+  option to override this default.
+
+* **extra-compounds**
+  A file containing information for residues in this specific target. This file may be in either CCD or CCP4
+  monomer library format.
+
+* **mmcif-dictionary**
+  Specify the path to the mmcif pdbx dictionary file. The default is to use the dictionary installed by libcifpp,
+  use this option to override this default.
+
+* **no-validate**
+  Omit the validation of the input mmCIF file. This will force output even in case the input file contains errors.
+
+* **electron-scattering**
   Use electron scattering factors instead of X-ray scattering factors.
-* **--use-auth-ids**
-  By default, when reading mmCIF files, the label_xxx_id is used in the
-  edstats output. Use this flag to force output with the auth_xxx_ids.
-* **--output-format**
-  By default a JSON file is written, unless the filename ends with .eds.
-  Use this option to force output in _edstats_ or _json_ format.
-* **--verbose**,**-V**
+
+* **use-auth-ids**
+  By default, when reading mmCIF files, the label_xxx_id is used in the edstats output. Use this flag to force
+  output with the auth_xxx_ids.
+
+* **output-format**
+  By default a JSON file is written, unless the filename ends with .eds.  Use this option to force output in
+  edstats or json format.
+
+* **verbose,-V**
   Be more verbose, useful to diagnose validation errors.
 
 # References
@@ -160,4 +175,4 @@ Written by Maarten L. Hekkelman &lt;[maarten@hekkelman.com](mailto:maarten@hekke
 
 # Reporting Bugs
 
-Report bugs at https://github.com/PDB-REDO/density-fitness/issues
+Report bugs at <https://github.com/PDB-REDO/density-fitness/issues>

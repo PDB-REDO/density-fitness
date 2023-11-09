@@ -14,7 +14,7 @@ find_package(Boost COMPONENTS headers QUIET)
 
 if(NOT Boost_FOUND)
 	ExternalProject_Add(
-		boost
+		local_boost
 		URL https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.tar.gz
 		URL_HASH SHA1=eb5e17350b5ccd5926fd6bad9f09385c742a3352
 		DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
@@ -23,31 +23,32 @@ if(NOT Boost_FOUND)
 		BUILD_COMMAND ""
 		INSTALL_COMMAND ./b2 install
 	)
-	set(BOOST_D ${BOOST_D})
+	set(BOOST_D local_boost)
 endif()
 
 find_package(libmcfp QUIET)
 
 if(NOT libmcfp_FOUND)
 	ExternalProject_Add(
-		libmcfp
+		local_libmcfp
 		GIT_REPOSITORY https://github.com/mhekkel/libmcfp
 		GIT_TAG trunk
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
 	)
-	set(LIBMCFP_D libmcfp)
+	set(LIBMCFP_D local_libmcfp)
 endif()
 
 find_package(Mrc QUIET)
 
 if(NOT Mrc_FOUND)
 	ExternalProject_Add(
-		mrc
+		local_mrc
 		DEPENDS ${LIBMCFP_D}
 		GIT_REPOSITORY https://github.com/mhekkel/mrc
 		GIT_TAG trunk
 		CMAKE_ARGS -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
 	)
+	set(MRC_D local_mrc)
 endif()
 
 find_package(CCP4 QUIET COMPONENTS ccp4c clipper-core clipper-ccp4 clipper-contrib)
@@ -91,7 +92,7 @@ if(NOT CCP4_FOUND)
 	)
 
 	ExternalProject_Add(
-		clipper
+		local_clipper
 		DEPENDS fftw-single fftw-double libccp4
 		DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
 		URL http://ftp.ccp4.ac.uk/opensource/clipper-2.1.20201109.tar.gz
@@ -106,76 +107,87 @@ if(NOT CCP4_FOUND)
 		<SOURCE_DIR>/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/external --enable-ccp4
 		BUILD_COMMAND ${MAKE_EXE}
 	)
-	set(CLIPPER_D clipper)
+	set(CCP4_D local_clipper)
 endif()
 
 find_package(Eigen3 QUIET)
 
 if(NOT Eigen3_FOUND)
 	ExternalProject_Add(
-		Eigen3
+		local_Eigen3
 		GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
 		GIT_TAG 3.4.0
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
 	)
 
-	set(EIGEN3_D Eigen3)
+	set(EIGEN3_D local_Eigen3)
 endif()
 
 find_package(pdb-redo 3.0.1 QUIET)
 
 if(NOT pdb-redo_FOUND)
-	ExternalProject_Add(
-		zlib-dev
-		URL https://www.zlib.net/zlib-1.3.tar.gz
-		URL_HASH SHA1=04d053e4d4064a0fb8f0cbd127f0bfb5fe4eb554
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
-	)
+	find_package(cifpp 5 QUIET)
+
+	if(NOT cifpp_FOUND)
+		ExternalProject_Add(
+			zlib-dev
+			URL https://www.zlib.net/zlib-1.3.tar.gz
+			URL_HASH SHA1=04d053e4d4064a0fb8f0cbd127f0bfb5fe4eb554
+			CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
+		)
+
+		ExternalProject_Add(
+			local_cifpp
+			DEPENDS ${EIGEN3_D} ${BOOST_D} zlib-dev
+			GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git
+			GIT_TAG trunk
+			CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
+			-DCIFPP_CACHE_DIR=/var/cache/libcifpp
+			-DCIFPP_DATA_DIR=/usr/share/libcifpp
+			-DBUILD_TESTING=OFF
+			-DCIFPP_DOWNLOAD_CCD=OFF
+			-DCIFPP_INSTALL_UPDATE_SCRIPT=OFF
+			-DWRITE_DATA_FILES=OFF
+		)
+
+		set(CIFPP_D local_cifpp)
+	endif()
+
+	find_package(newuoa QUIET)
+
+	if(NOT newuoa_FOUND)
+		ExternalProject_Add(
+			local_newuoa
+			GIT_REPOSITORY https://github.com/elsid/newuoa-cpp
+			GIT_TAG v0.1.2
+			CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
+		)
+		set(NEWUOA_D local_newuoa)
+	endif()
 
 	ExternalProject_Add(
-		libcifpp
-		DEPENDS ${EIGEN3_D} ${BOOST_D} zlib-dev
-		GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git
-		GIT_TAG trunk
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
-		-DCIFPP_CACHE_DIR=/var/cache/libcifpp
-		-DCIFPP_DATA_DIR=/usr/share/libcifpp
-		-DBUILD_TESTING=OFF
-		-DCIFPP_DOWNLOAD_CCD=OFF
-		-DCIFPP_INSTALL_UPDATE_SCRIPT=OFF
-		-DWRITE_DATA_FILES=OFF
-	)
-
-	ExternalProject_Add(
-		newuoa
-		GIT_REPOSITORY https://github.com/elsid/newuoa-cpp
-		GIT_TAG v0.1.2
-		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
-	)
-
-	ExternalProject_Add(
-		libpdb-redo
-		DEPENDS libcifpp newuoa ${CLIPPER_D}
+		local_libpdb-redo
+		DEPENDS ${CIFPP_D} ${NEWUOA_D} ${CCP4_D}
 		GIT_REPOSITORY https://github.com/PDB-REDO/libpdb-redo.git
 		GIT_TAG trunk
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external -DBUILD_TESTING=OFF -DBUILD_MINIMIZER=OFF
 	)
-	set(PDB_REDO_D libpdb-redo)
+	set(PDB_REDO_D local_libpdb-redo)
 endif()
 
-find_package(zeep QUIET)
+find_package(zeep 6 QUIET)
 
 if(NOT zeep_FOUND)
 	ExternalProject_Add(
-		date
+		local_date
 		GIT_REPOSITORY https://github.com/HowardHinnant/date
 		GIT_TAG v3.0.1
 		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
 	)
 
 	ExternalProject_Add(
-		libzeep
-		DEPENDS ${BOOST_D} date ${MRC_D}
+		local_libzeep
+		DEPENDS ${BOOST_D} local_date ${MRC_D}
 		GIT_REPOSITORY https://github.com/mhekkel/libzeep
 		GIT_TAG trunk
 		CMAKE_ARGS -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external
@@ -185,19 +197,36 @@ if(NOT zeep_FOUND)
 
 	ExternalProject_Add_StepDependencies(libzeep build ${BOOST_D} date)
 
-	set(ZEEP_D libzeep)
+	set(ZEEP_D local_libzeep)
 endif()
+
+find_package(Git REQUIRED)
+
+set(DF_TRUNK_SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/density-fitness)
+
+if(EXISTS ${DF_TRUNK_SOURCE_DIR})
+	execute_process(
+		COMMAND ${CMAKE_COMMAND} -E env ${GIT_EXECUTABLE} pull
+		WORKING_DIRECTORY ${DF_TRUNK_SOURCE_DIR}
+		COMMAND_ECHO STDOUT
+	)
+else()
+	execute_process(
+		COMMAND ${CMAKE_COMMAND} -E env ${GIT_EXECUTABLE} clone file://${CMAKE_CURRENT_SOURCE_DIR}/ ${DF_TRUNK_SOURCE_DIR} -b trunk
+		COMMAND_ECHO STDOUT
+	)
+endif()
+
 
 ExternalProject_Add(density-fitness
 	DEPENDS ${ZEEP_D} ${PDB_REDO_D} ${LIBMCFP_D}
-	GIT_REPOSITORY file://${CMAKE_CURRENT_SOURCE_DIR}/
-	GIT_TAG trunk
+	SOURCE_DIR ${DF_TRUNK_SOURCE_DIR}
 	CMAKE_ARGS
 	-DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/external
 	-DCIFPP_SHARE_DIR=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/libcifpp/rsrc
 	-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 	INSTALL_COMMAND ""
-	BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/density-fitness)
+	BINARY_DIR ${DF_TRUNK_SOURCE_DIR})
 
 install(CODE [[
 	execute_process(COMMAND ${CMAKE_COMMAND}

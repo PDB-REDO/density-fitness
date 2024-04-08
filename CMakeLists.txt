@@ -105,10 +105,17 @@ if(USE_RSRC)
 endif()
 
 # libraries
-if(NOT PDB_REDO_META)
-	find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+if(NOT (libmcfp_FOUND OR TARGET libmcfp))
 	find_package(libmcfp REQUIRED)
+endif()
+
+if(NOT (zeep_FOUND OR TARGET zeep))
 	find_package(zeep REQUIRED)
+endif()
+
+if(NOT (pdb-redo_FOUND OR TARGET pdb-redo))
 	find_package(pdb-redo 3.0.1 REQUIRED)
 endif()
 

@@ -33,6 +33,8 @@
 #include <sstream>
 #include <vector>
 
+#include <cif++.hpp>
+
 #include "../src/density-fitness.hpp"
 
 namespace fs = std::filesystem;
@@ -49,6 +51,9 @@ bool init_unit_test()
 
 	if (boost::unit_test::framework::master_test_suite().argc == 2)
 		gTestDir = boost::unit_test::framework::master_test_suite().argv[1];
+
+	cif::add_file_resource("components.cif", gTestDir / "ccd-subset.cif");
+	cif::compound_factory::instance().push_dictionary(gTestDir / "REA.cif");
 
 	return true;
 }

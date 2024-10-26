@@ -105,8 +105,6 @@ if(USE_RSRC)
 endif()
 
 # libraries
-find_package(Eigen3 REQUIRED)
-
 if(NOT (libmcfp_FOUND OR TARGET libmcfp))
 	find_package(libmcfp REQUIRED)
 endif()

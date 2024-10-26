@@ -1,6 +1,8 @@
 .vscode/
 .gdb_history
 build/
-test/
 src/revision.hpp
-
+test/*.ccp4
+test/*.eds
+test/*.mtz
+!test/1cbs_map.mtz

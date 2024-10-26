@@ -1,3 +1,6 @@
+Version 1.0.12
+- Changed testing to use minimal CCD
+
 Version 1.0.11
 - Changes required to build on Windows
 

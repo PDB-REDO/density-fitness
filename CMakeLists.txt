@@ -121,8 +121,8 @@ if(USE_RSRC)
 endif()
 
 # libraries
-if(NOT (libmcfp_FOUND OR TARGET libmcfp))
-	find_package(libmcfp REQUIRED)
+if(NOT (mcfp_FOUND OR TARGET mcfp))
+	find_package(mcfp REQUIRED)
 endif()
 
 if(NOT (zeep_FOUND OR TARGET zeep))
@@ -142,7 +142,7 @@ if(USE_RSRC)
 endif()
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo libmcfp::libmcfp zeep::zeep)
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo mcfp::mcfp zeep::zeep)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
@@ -158,7 +158,7 @@ if(BUILD_TESTING)
 
 	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
-	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo libmcfp::libmcfp zeep::zeep Boost::headers)
+	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo mcfp::mcfp zeep::zeep Boost::headers)
 
 	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
 

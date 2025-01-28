@@ -1,3 +1,6 @@
+Version 1.1.1
+- Update libmcfp dependency
+
 Version 1.1.0
 - Changed command line arguments for loading dictionaries
   containing chemical compound information in either

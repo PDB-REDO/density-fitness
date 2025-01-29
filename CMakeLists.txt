@@ -25,7 +25,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 # set the project name
-project(density-fitness VERSION 1.1.1 LANGUAGES CXX)
+project(density-fitness VERSION 1.1.2 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -121,17 +121,9 @@ if(USE_RSRC)
 endif()
 
 # libraries
-if(NOT (mcfp_FOUND OR TARGET mcfp))
-	find_package(mcfp REQUIRED)
-endif()
-
-if(NOT (zeep_FOUND OR TARGET zeep))
-	find_package(zeep REQUIRED)
-endif()
-
-if(NOT (pdb-redo_FOUND OR TARGET pdb-redo))
-	find_package(pdb-redo 3.2.0 REQUIRED)
-endif()
+find_package(mcfp REQUIRED)
+find_package(zeep REQUIRED)
+find_package(pdb-redo 3.2.0 REQUIRED)
 
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp
@@ -150,21 +142,7 @@ install(TARGETS ${PROJECT_NAME}
 
 # testing
 if(BUILD_TESTING)
-	find_package(Boost REQUIRED)
-
-	add_executable(unit-test-density-fitness
-		${PROJECT_SOURCE_DIR}/test/unit-test-density-fitness.cpp
-		${PROJECT_SOURCE_DIR}/src/density-fitness.cpp)
-
-	target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
-
-	target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo mcfp::mcfp zeep::zeep Boost::headers)
-
-	add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> -- ${PROJECT_SOURCE_DIR}/test)
-
-	if(USE_RSRC)
-		mrc_target_resources(unit-test-density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic ${CIFPP_SHARE_DIR}/mmcif_ddl.dic)
-	endif()
+	add_subdirectory(test)
 endif()
 
 # manual

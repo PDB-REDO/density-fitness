@@ -24,8 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define BOOST_TEST_ALTERNATIVE_INIT_API
-#include <boost/test/included/unit_test.hpp>
+#include <catch2/catch_all.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -38,29 +37,45 @@
 #include "../src/density-fitness.hpp"
 
 namespace fs = std::filesystem;
-namespace tt = boost::test_tools;
-namespace utf = boost::unit_test;
 
 // --------------------------------------------------------------------
 
 fs::path gTestDir = fs::current_path();
 
-bool init_unit_test()
+int main(int argc, char *argv[])
 {
-	// not a test, just initialize test dir
+	Catch::Session session; // There must be exactly one instance
 
-	if (boost::unit_test::framework::master_test_suite().argc == 2)
-		gTestDir = boost::unit_test::framework::master_test_suite().argv[1];
+	// Build a new parser on top of Catch2's
+#if CATCH22
+	using namespace Catch::clara;
+#else
+	// Build a new parser on top of Catch2's
+	using namespace Catch::Clara;
+#endif
+
+	auto cli = session.cli()                               // Get Catch2's command line parser
+	           | Opt(gTestDir, "data-dir")                 // bind variable to a new option, with a hint string
+	                 ["-D"]["--data-dir"]                  // the option names it will respond to
+	           ("The directory containing the data files") // description string for the help output
+	           | Opt(cif::VERBOSE, "verbose")["-v"]["--cif-verbose"]("Flag for cif::VERBOSE");
+
+	// Now pass the new composite back to Catch2 so it uses that
+	session.cli(cli);
+
+	// Let Catch2 (using Clara) parse the command line
+	int returnCode = session.applyCommandLine(argc, argv);
+	if (returnCode != 0) // Indicates a command line error
+		return returnCode;
 
 	cif::add_file_resource("components.cif", gTestDir / "ccd-subset.cif");
 	cif::compound_factory::instance().push_dictionary(gTestDir / "REA.cif");
 
-	return true;
+	return session.run();
 }
-
 // --------------------------------------------------------------------
 
-BOOST_AUTO_TEST_CASE(test_1)
+TEST_CASE("test_1")
 {
 	// Simply compare results for 1cbs. TODO: Perhaps we should have a more complicated test case one day
 
@@ -84,7 +99,7 @@ BOOST_AUTO_TEST_CASE(test_1)
 
 	std::cout.rdbuf(saved);
 
-	BOOST_CHECK_EQUAL(r, 0);
+	REQUIRE(r == 0);
 
 	std::ifstream reference(gTestDir / "1cbs-eds.eds");
 
@@ -93,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_1)
 	getline(ss, line_a);
 	getline(reference, line_b);
 
-	BOOST_CHECK_EQUAL(line_a, line_b);
+	CHECK(line_a == line_b);
 
 	for (;;)
 	{
@@ -110,13 +125,13 @@ BOOST_AUTO_TEST_CASE(test_1)
 		sa >> ra >> va[0] >> va[1] >> va[2] >> na >> va[3] >> va[4];
 		sb >> rb >> vb[0] >> vb[1] >> vb[2] >> nb >> vb[3] >> vb[4];
 
-		BOOST_CHECK_EQUAL(ra, rb);
-		BOOST_CHECK_EQUAL(na, nb);
+		CHECK(ra == rb);
+		CHECK(na == nb);
 
-		BOOST_TEST(va[0] == vb[0], tt::tolerance(0.01f));
-		BOOST_TEST(va[1] == vb[1], tt::tolerance(0.01f));
-		BOOST_TEST(va[2] == vb[2], tt::tolerance(0.01f));
-		BOOST_TEST(va[3] == vb[3], tt::tolerance(0.1f));	// EDIAm flucuates a bit more
-		BOOST_TEST(va[4] == vb[4], tt::tolerance(0.01f));
+		REQUIRE_THAT(va[0], Catch::Matchers::WithinRel(vb[0], 0.01f));
+		REQUIRE_THAT(va[1], Catch::Matchers::WithinRel(vb[1], 0.01f));
+		REQUIRE_THAT(va[2], Catch::Matchers::WithinRel(vb[2], 0.01f));
+		REQUIRE_THAT(va[3], Catch::Matchers::WithinRel(vb[3], 0.1f));	// EDIAm flucuates a bit more
+		REQUIRE_THAT(va[4], Catch::Matchers::WithinRel(vb[4], 0.01f));
 	}
 }

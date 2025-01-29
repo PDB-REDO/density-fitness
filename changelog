@@ -1,5 +1,6 @@
 Version 1.1.2
 - Replace boost test with Catch2
+- Fix incorrect include of mcfp.hpp
 
 Version 1.1.1
 - Update libmcfp dependency

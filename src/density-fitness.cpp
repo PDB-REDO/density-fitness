@@ -34,7 +34,7 @@
 #include <filesystem>
 
 #include <zeep/json/element.hpp>
-#include <mcfp.hpp>
+#include <mcfp/mcfp.hpp>
 #include <cif++/gzio.hpp>
 
 #include <pdb-redo/BondMap.hpp>

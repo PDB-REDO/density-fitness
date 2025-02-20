@@ -121,7 +121,7 @@ if(USE_RSRC)
 endif()
 
 # libraries
-find_package(mcfp REQUIRED)
+find_package(mcfp 1.3.5 REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(pdb-redo 3.2.0 REQUIRED)
 

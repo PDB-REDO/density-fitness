@@ -21,7 +21,7 @@ add_executable(unit-test-density-fitness
 
 target_include_directories(unit-test-density-fitness PRIVATE ${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR})
 
-target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo mcfp::mcfp zeep::zeep Catch2::Catch2WithMain)
+target_link_libraries(unit-test-density-fitness pdb-redo::pdb-redo mcfp::mcfp nlohmann_json::nlohmann_json Catch2::Catch2WithMain)
 
 add_test(NAME unit-test-density-fitness COMMAND $<TARGET_FILE:unit-test-density-fitness> --data-dir ${PROJECT_SOURCE_DIR}/test)
 

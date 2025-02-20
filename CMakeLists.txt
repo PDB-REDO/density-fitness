@@ -122,7 +122,7 @@ endif()
 
 # libraries
 find_package(mcfp REQUIRED)
-find_package(zeep REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(pdb-redo 3.2.0 REQUIRED)
 
 add_executable(density-fitness
@@ -134,7 +134,7 @@ if(USE_RSRC)
 endif()
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
-target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo mcfp::mcfp zeep::zeep)
+target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo mcfp::mcfp nlohmann_json::nlohmann_json)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}

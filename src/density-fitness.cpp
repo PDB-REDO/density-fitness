@@ -1,17 +1,17 @@
 /*-
  * SPDX-License-Identifier: BSD-2-Clause
- * 
+ *
  * Copyright (c) 2020 NKI/AVL, Netherlands Cancer Institute
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
  *    list of conditions and the following disclaimer
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,18 +24,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
+/*
    Created by: Maarten L. Hekkelman
    Date: woensdag 27 december, 2017
 */
 
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
-#include <filesystem>
 
-#include <zeep/json/element.hpp>
-#include <mcfp/mcfp.hpp>
 #include <cif++/gzio.hpp>
+#include <mcfp/mcfp.hpp>
+#include <nlohmann/json.hpp>
 
 #include <pdb-redo/BondMap.hpp>
 #include <pdb-redo/Compound.hpp>
@@ -50,7 +50,7 @@ namespace fs = std::filesystem;
 
 // --------------------------------------------------------------------
 
-int density_fitness_main(int argc, char* const argv[])
+int density_fitness_main(int argc, char *const argv[])
 {
 	// this kinda sucks...
 	pdb_redo::force_link = 1;
@@ -103,7 +103,7 @@ int density_fitness_main(int argc, char* const argv[])
 	}
 
 	// --------------------------------------------------------------------
-	
+
 	fs::path hklin, xyzin, output;
 
 	if (config.has("hklin"))
@@ -122,32 +122,32 @@ int density_fitness_main(int argc, char* const argv[])
 		hklin = operands.front();
 		operands.pop_front();
 	}
-	
+
 	if (xyzin.empty() and not operands.empty())
 	{
 		xyzin = operands.front();
 		operands.pop_front();
 	}
-	
+
 	if (output.empty() and not operands.empty())
 	{
 		output = operands.front();
 		operands.pop_front();
 	}
-	
-	if (hklin.empty() and not (config.has("fomap") and config.has("dfmap")))
+
+	if (hklin.empty() and not(config.has("fomap") and config.has("dfmap")))
 	{
 		std::cout << config << std::endl;
 		exit(1);
 	}
-	
+
 	const std::set<std::string> kAnisoOptions{ "none", "calculated", "observed" };
 	if (config.has("aniso-scaling") and kAnisoOptions.count(config.get<std::string>("aniso-scaling")) == 0)
 	{
 		std::cerr << "Invalid option for aniso-scaling, allowed values are none, observed and calculated" << std::endl;
 		exit(1);
 	}
-	
+
 	if (config.has("quiet"))
 		cif::VERBOSE = -1;
 	else
@@ -157,12 +157,12 @@ int density_fitness_main(int argc, char* const argv[])
 
 	if (config.has("compounds"))
 		cif::add_file_resource("components.cif", config.get<std::string>("compounds"));
-	
+
 	// Load dictionaries, if any
 
 	if (config.has("ccd-dict"))
 		cif::compound_factory::instance().push_dictionary(config.get<std::string>("ccd-dict"));
-	
+
 	if (config.has("restraint-dict"))
 		pdb_redo::CompoundFactory::instance().pushDictionary(config.get<std::string>("restraint-dict"));
 
@@ -187,16 +187,16 @@ int density_fitness_main(int argc, char* const argv[])
 	bool electronScattering = config.has("electron-scattering");
 	if (not electronScattering)
 	{
-		auto& exptl = f.front()["exptl"];
+		auto &exptl = f.front()["exptl"];
 		electronScattering = not exptl.empty() and exptl.front()["method"] == "ELECTRON CRYSTALLOGRAPHY";
 	}
-	
+
 	pdb_redo::MapMaker<float> mm;
-	
+
 	if (not hklin.empty())
 	{
 		float samplingRate = config.get<float>("sampling-rate");
-	
+
 		if (config.has("recalc"))
 		{
 			auto aniso = pdb_redo::MapMaker<float>::as_None;
@@ -207,7 +207,7 @@ int density_fitness_main(int argc, char* const argv[])
 				else if (config.get<std::string>("aniso-scaling") == "calculated")
 					aniso = pdb_redo::MapMaker<float>::as_Calculated;
 			}
-			
+
 			mm.calculate(
 				hklin, structure, config.has("no-bulk"), aniso, samplingRate, electronScattering);
 		}
@@ -235,12 +235,12 @@ int density_fitness_main(int argc, char* const argv[])
 			reslo = f["d_resolution_low"].as<float>();
 		else
 			throw std::runtime_error("missing low resolution");
-		
+
 		mm.loadMaps(config.get<std::string>("dfmap"), config.get<std::string>("fomap"), reshi, reslo);
 	}
-	
+
 	std::vector<pdb_redo::ResidueStatistics> r;
-	
+
 	if (config.has("no-edia"))
 	{
 		pdb_redo::StatsCollector collector(mm, structure, electronScattering);
@@ -272,11 +272,11 @@ int density_fitness_main(int argc, char* const argv[])
 
 	if (formatAsJSON)
 	{
-		using object = zeep::json::element;
+		using object = nlohmann::json;
 
 		object stats;
-		
-		for (auto i: r)
+
+		for (auto i : r)
 		{
 			auto &res = structure.get_residue(i.asymID, i.seqID, i.authSeqID);
 
@@ -284,23 +284,18 @@ int density_fitness_main(int argc, char* const argv[])
 				{ "asymID", i.asymID },
 				{ "seqID", i.seqID },
 				{ "compID", i.compID },
-				{
-					"pdb", {
-						{ "strandID", res.get_auth_asym_id() },
-						{ "seqNum", i.authSeqID.empty() ? 0 : stoi(i.authSeqID) },
-						{ "compID", i.compID },
-						{ "insCode", res.get_pdb_ins_code() }
-					}
-				},
+				{ "pdb", { { "strandID", res.get_auth_asym_id() },
+							 { "seqNum", i.authSeqID.empty() ? 0 : stoi(i.authSeqID) },
+							 { "compID", i.compID },
+							 { "insCode", res.get_pdb_ins_code() } } },
 				{ "RSR", i.RSR },
 				{ "SRSR", i.SRSR },
 				{ "RSCCS", i.RSCCS },
 				{ "NGRID", i.ngrid },
 				{ "EDIAm", i.EDIAm },
-				{ "OPIA", i.OPIA }
-			});
+				{ "OPIA", i.OPIA } });
 		}
-		
+
 		out << stats << std::endl;
 	}
 	else
@@ -312,13 +307,13 @@ int density_fitness_main(int argc, char* const argv[])
 			<< "NGRID" << '\t'
 			<< "EDIAm" << '\t'
 			<< "OPIA" << std::endl;
-	
+
 		bool writeAuth = config.has("use-auth-ids");
-	
-		for (auto i: r)
+
+		for (auto i : r)
 		{
 			std::string id;
-			
+
 			if (writeAuth)
 			{
 				auto &res = structure.get_residue(i.asymID, i.seqID, i.authSeqID);
@@ -329,7 +324,7 @@ int density_fitness_main(int argc, char* const argv[])
 				id = i.compID + '_' + i.asymID + '_' + i.authSeqID;
 			else
 				id = i.compID + '_' + i.asymID + '_' + std::to_string(i.seqID);
-			
+
 			out << std::fixed << std::setprecision(3)
 				<< id << '\t'
 				<< i.RSR << '\t'
@@ -340,6 +335,6 @@ int density_fitness_main(int argc, char* const argv[])
 				<< std::setprecision(1) << i.OPIA << std::endl;
 		}
 	}
-	
+
 	return 0;
 }

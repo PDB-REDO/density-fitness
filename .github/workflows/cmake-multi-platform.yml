@@ -50,10 +50,10 @@ jobs:
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_TESTING=ON
         -S ${{ github.workspace }}
+        # -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release

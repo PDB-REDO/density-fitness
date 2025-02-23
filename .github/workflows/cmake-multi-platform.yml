@@ -35,7 +35,7 @@ jobs:
     - name: Install dependencies Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: >
-        sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev
+        sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev
 
     # - name: Install Catch2 macOS
     #   if: matrix.os == 'macos-latest'

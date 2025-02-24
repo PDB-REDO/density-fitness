@@ -1,4 +1,4 @@
-# CMake module to find a package, or fetch it if not found
+# CMake module to find a package, or fetch it in case it is not found locally
 
 cmake_minimum_required(VERSION 3.25)
 

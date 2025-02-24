@@ -13,17 +13,6 @@ jobs:
     strategy:
       fail-fast: false
 
-      matrix:
-        os: [ubuntu-latest]
-        # os: [ubuntu-latest, windows-latest, macos-latest]
-        include:
-        #   - os: windows-latest
-        #     cpp_compiler: cl
-          - os: ubuntu-latest
-            cpp_compiler: g++
-        #   - os: macos-latest
-        #     cpp_compiler: clang++
-
     steps:
     - uses: actions/checkout@v3
 
@@ -33,19 +22,8 @@ jobs:
       run: echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Install dependencies Ubuntu
-      if: matrix.os == 'ubuntu-latest'
       run: >
-        sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev libnewuoa-dev
-
-    # - name: Install Catch2 macOS
-    #   if: matrix.os == 'macos-latest'
-    #   run: >
-    #     brew install catch2
-
-    # - name: Install dependencies Window
-    #   if: matrix.os == 'windows-latest'
-    #   run: ./tools/depends.cmd
-    #   shell: cmd
+        sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev
 
     - name: Configure CMake
       run: >
@@ -53,14 +31,13 @@ jobs:
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_TESTING=ON
         -S ${{ github.workspace }}
-        # -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ctest --build-config Release --output-on-failure -R dssp
+      run: ctest --build-config Release --output-on-failure -R unit-test-density-fitness
       env:
         LIBCIFPP_DATA_DIR: ${{ steps.strings.outputs.build-output-dir }}/_deps/cifpp-src/rsrc
 

@@ -7,45 +7,33 @@ of programs.
 Installation
 ------------
 
-The easiest way to build and install density-fitness is by using the builder script, this is a CMake file that will build all missing dependencies automatically. Use it like this:
+The easiest way to install density-fitness is by installing [CCP4](https://www.ccp4.ac.uk/download/index.php)
+
+It is possible to install density-fitness on Linux without having CCP4. In that case you will have install some dependencies first. On Debian this boils down to:
 
 ```console
-git clone https://github.com/PDB-REDO/density-fitness.git -b density-fitness-builder
-cd density-fitness
-cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$HOME/.local
-cmake --build build
-cmake --install build
+sudo apt-get update && sudo apt-get install libcatch2-dev nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev libnewuoa-dev
 ```
 
-Those commands will create an executable and install it in $HOME/.local. You can specify any other path here of course.
+And on Ubuntu, slightly different:
 
-Please note that density-fitness built this way still requires a CCD components.cif file. This file should be located in '/usr/share/libcifpp/' or '/var/cache/libcifpp/'. You can of course also provide your own version of this file using the command line argumentsn (See [options](#options) below).
+```console
+sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev libnewuoa-dev
+```
 
-If you want to install the classic way, you have to install all dependencies first. See the documentation for [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-redo) on installing all prerequisites.
-
-After that, density-fitness can be built as follows:
+After that, building and installing should be as simple as:
 
 ```console
 git clone https://github.com/PDB-REDO/density-fitness.git
 cd density-fitness
-mkdir build
-cd build
-cmake ..
-cmake --build .
-cmake --install .
+cmake -S . -B build
+cmake --build build
+sudo cmake --install build
 ```
 
-When building on Windows you should replace `cmake --build .` with `cmake --build . --config Release`.
+Please note that density-fitness built this way still requires a CCD components.cif file. This file should be located in '/usr/share/libcifpp/' or '/var/cache/libcifpp/'. You can of course also provide your own version of this file using the command line argumentsn (See [options](#options) below).
 
-This checks out the source code from github, creates a new directory
-where cmake stores its files. Run a configure, build the code and run
-tests. And then it installs the library and auxiliary files.
-
-The default is to install everything in `$HOME/.local` on Linux and
-`%LOCALAPPDATA%` on Windows (the AppData/Local folder in your home directory).
-You can change this by specifying the prefix with the
-[CMAKE_INSTALL_PREFIX](https://cmake.org/cmake/help/v3.21/variable/CMAKE_INSTALL_PREFIX.html)
-variable.
+If you want to install the classic way, you have to install all dependencies first. See the documentation for [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-redo) on installing all prerequisites.
 
 Usage
 -----

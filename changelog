@@ -1,3 +1,7 @@
+Version 1.1.3
+- New cmake file, fetching dependencies automatically
+- replaced libzeep with nlohmann_json
+
 Version 1.1.2
 - Replace boost test with Catch2
 - Fix incorrect include of mcfp.hpp

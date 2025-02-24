@@ -1,22 +1,29 @@
 # CMake module to find a package, or fetch it if not found
 
+cmake_minimum_required(VERSION 3.25)
+
 function(find_or_fetch_package _package)
 	set(flags VERBOSE)
 	set(options VERSION GIT_REPOSITORY GIT_TAG)
-	cmake_parse_arguments(FOF_OPTIONS "${flags}" "${options}" "" ${ARGN})
+	set(variables VARIABLES)
+	cmake_parse_arguments(FOF_OPTIONS "${flags}" "${options}" "${variables}" ${ARGN})
 
 	if(NOT _package)
 		message(FATAL_ERROR "TARGET option is missing")
 	endif()
 
 	if(TARGET "${_package}" OR ${_package}_FOUND)
-		return()
+		return(PROPAGATE ${FOF_OPTIONS_VARIABLES})
 	endif()
 
 	find_package("${_package}" ${FOF_OPTIONS_VERSION} QUIET)
 
+	if(${FOF_OPTIONS_VARIABLES})
+		message(NOTICE "fof cifpp data dir: ${CIFPP_SHARE_DIR}")
+	endif()
+
 	if(${_package}_FOUND)
-		return()
+		return(PROPAGATE ${FOF_OPTIONS_VARIABLES})
 	endif()
 
 	include(FetchContent)
@@ -35,5 +42,7 @@ function(find_or_fetch_package _package)
 		GIT_TAG  ${FOF_OPTIONS_GIT_TAG})
 	
 	FetchContent_MakeAvailable("${_package}")
-	
+
+	return(PROPAGATE ${FOF_OPTIONS_VARIABLES})
+
 endfunction()

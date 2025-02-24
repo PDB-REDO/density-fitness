@@ -130,8 +130,6 @@ find_or_fetch_package(mcfp VERSION 1.3.5 GIT_REPOSITORY https://github.com/mhekk
 find_or_fetch_package(cifpp VERSION 7 GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git GIT_TAG v7.0.9 VARIABLES "CIFPP_SHARE_DIR")
 find_or_fetch_package(pdb-redo VERSION 3.2.0 GIT_REPOSITORY https://github.com/PDB-REDO/libpdb-redo.git GIT_TAG v3.2.1)
 
-message(NOTICE "cifpp data dir: ${CIFPP_SHARE_DIR}")
-
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp)

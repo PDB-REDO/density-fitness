@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
 
 	return session.run();
 }
+
 // --------------------------------------------------------------------
 
 TEST_CASE("test_1")

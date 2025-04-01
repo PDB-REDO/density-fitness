@@ -129,10 +129,10 @@ TEST_CASE("test_1")
 		CHECK(ra == rb);
 		CHECK(na == nb);
 
-		REQUIRE_THAT(va[0], Catch::Matchers::WithinRel(vb[0], 0.01f));
-		REQUIRE_THAT(va[1], Catch::Matchers::WithinRel(vb[1], 0.01f));
-		REQUIRE_THAT(va[2], Catch::Matchers::WithinRel(vb[2], 0.01f));
-		REQUIRE_THAT(va[3], Catch::Matchers::WithinRel(vb[3], 0.1f));	// EDIAm flucuates a bit more
-		REQUIRE_THAT(va[4], Catch::Matchers::WithinRel(vb[4], 0.1f));	// So does OPIA, I guess?
+		CHECK_THAT(va[0], Catch::Matchers::WithinRel(vb[0], 0.01f));
+		CHECK_THAT(va[1], Catch::Matchers::WithinRel(vb[1], 0.01f));
+		CHECK_THAT(va[2], Catch::Matchers::WithinRel(vb[2], 0.01f));
+		CHECK_THAT(va[3], Catch::Matchers::WithinRel(vb[3], 0.1f));	// EDIAm flucuates a bit more
+		CHECK_THAT(va[4], Catch::Matchers::WithinRel(vb[4], 0.1f));	// So does OPIA, I guess?
 	}
 }

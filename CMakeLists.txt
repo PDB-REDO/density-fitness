@@ -113,11 +113,11 @@ find_package(Mrc QUIET)
 if(MRC_FOUND)
 	option(USE_RSRC "Use mrc to create resources" ON)
 else()
-	message(STATUS "Not using resources since mrc was not found")
+	message(STATUS "density-fitness: Not using resources since mrc was not found")
 endif()
 
 if(USE_RSRC)
-	message("Using resources compiled with ${MRC_EXECUTABLE}")
+	message(STATUS "density-fitness: Using resources compiled with ${MRC_EXECUTABLE}")
 	mrc_write_header(${PROJECT_BINARY_DIR}/mrsrc.hpp)
 endif()
 

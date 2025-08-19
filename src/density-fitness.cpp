@@ -179,7 +179,7 @@ int density_fitness_main(int argc, char *const argv[])
 	auto &db = f.front();
 	auto entry_id = db["entry"].empty() ? db.name() : db["entry"].front().get<std::string>("id");
 
-	cif::mm::structure structure(f, 1, cif::mm::StructureOpenOptions::SkipHydrogen);
+	cif::mm::structure structure(f, 1, cif::mm::structure_open_options{ .skip_hydrogen = true });
 
 	if (f.empty())
 		throw std::runtime_error("Invalid or empty mmCIF file");
@@ -284,7 +284,7 @@ int density_fitness_main(int argc, char *const argv[])
 				{ "asymID", i.asymID },
 				{ "seqID", i.seqID },
 				{ "compID", i.compID },
-				{ "pdb", { { "strandID", res.get_auth_asym_id() },
+				{ "pdb", { { "strandID", res.get_pdb_strand_id() },
 							 { "seqNum", i.authSeqID.empty() ? 0 : stoi(i.authSeqID) },
 							 { "compID", i.compID },
 							 { "insCode", res.get_pdb_ins_code() } } },
@@ -318,7 +318,7 @@ int density_fitness_main(int argc, char *const argv[])
 			{
 				auto &res = structure.get_residue(i.asymID, i.seqID, i.authSeqID);
 
-				id = i.compID + '_' + res.get_auth_asym_id() + '_' + res.get_auth_seq_id() + res.get_pdb_ins_code();
+				id = i.compID + '_' + res.get_pdb_strand_id() + '_' + res.get_pdb_seq_num() + res.get_pdb_ins_code();
 			}
 			else if (i.compID == "HOH")
 				id = i.compID + '_' + i.asymID + '_' + i.authSeqID;

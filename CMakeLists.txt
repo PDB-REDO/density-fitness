@@ -108,7 +108,7 @@ include(VersionString)
 write_version_header("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # Optionally use mrc to create resources
-find_package(Mrc QUIET)
+find_package(mrc QUIET)
 
 if(MRC_FOUND)
 	option(USE_RSRC "Use mrc to create resources" ON)

@@ -14,13 +14,13 @@ The easiest way to install density-fitness is by installing [CCP4](https://www.c
 It is possible to install density-fitness on Linux without having CCP4. In that case you will have install some dependencies first. On Debian this boils down to:
 
 ```console
-sudo apt-get update && sudo apt-get install libcatch2-dev nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev libnewuoa-dev
+sudo apt-get update && sudo apt-get install libcatch2-dev nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev
 ```
 
 And on Ubuntu, slightly different:
 
 ```console
-sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev libnewuoa-dev
+sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev
 ```
 
 After that, building and installing should be as simple as:

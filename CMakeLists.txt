@@ -25,17 +25,12 @@
 cmake_minimum_required(VERSION 3.25)
 
 # set the project name
-project(density-fitness VERSION 1.1.4 LANGUAGES CXX)
+project(density-fitness VERSION 1.2.0 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(FindOrFetch)
 include(GNUInstallDirs)
-include(CheckFunctionExists)
-include(CheckIncludeFile)
-include(CheckIncludeFiles)
-include(CheckLibraryExists)
-include(CMakePackageConfigHelpers)
 include(CTest)
 
 set(CXX_EXTENSIONS OFF)
@@ -125,7 +120,7 @@ endif()
 find_package(nlohmann_json REQUIRED)
 
 find_or_fetch_package(mcfp VERSION 1.3.5 GIT_REPOSITORY https://github.com/mhekkel/libmcfp GIT_TAG b6c62a3)
-find_or_fetch_package(cifpp VERSION 7 GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git GIT_TAG v7.0.9 VARIABLES "CIFPP_SHARE_DIR")
+find_or_fetch_package(cifpp VERSION 9 GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git GIT_TAG v9.0.5 VARIABLES "CIFPP_SHARE_DIR")
 find_or_fetch_package(pdb-redo VERSION 3.3.0 GIT_REPOSITORY https://github.com/PDB-REDO/libpdb-redo.git GIT_TAG v3.3.0)
 
 add_executable(density-fitness

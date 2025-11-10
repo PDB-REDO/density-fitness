@@ -1,5 +1,6 @@
 .vscode/
 .gdb_history
+.cache/
 build/
 src/revision.hpp
 test/*.ccp4

@@ -32,7 +32,7 @@
 #include <sstream>
 #include <vector>
 
-#include <cif++.hpp>
+#include <cif++/cif++.hpp>
 
 #include "../src/density-fitness.hpp"
 

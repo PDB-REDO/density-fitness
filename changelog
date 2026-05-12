@@ -1,3 +1,6 @@
+Version 1.2.1
+- Modfied tests required by changes in libpdb-redo
+
 Version 1.2.0
 - Based on libpdb-redo 3.3.1 which contains a fix for EDIA
   and OPIA calculation.

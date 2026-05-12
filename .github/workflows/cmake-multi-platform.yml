@@ -28,7 +28,7 @@ jobs:
     - name: Checkout libmcfp
       uses: actions/checkout@v4
       with:
-        repository: https://forge.hekkelman.net/maarten/mcfp.git
+        repository: mhekkel/libmcfp
         path: libmcfp
 
     - name: Build & install libmcfp

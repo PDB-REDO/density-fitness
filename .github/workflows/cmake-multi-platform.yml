@@ -25,6 +25,30 @@ jobs:
       run: >
         sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev
 
+    - name: Checkout libcifpp
+      uses: actions/checkout@v4
+      with:
+        repository: pdb-redo/libcifpp
+        path: libcifpp
+
+    - name: Build & install libcifpp
+      run: |
+        cmake -B ${{github.workspace}}/libcifpp/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -S ${{github.workspace}}/libcifpp -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
+        cmake --build ${{github.workspace}}/libcifpp/build
+        sudo cmake --install ${{github.workspace}}/libcifpp/build
+
+    - name: Checkout libpdb-redo
+      uses: actions/checkout@v4
+      with:
+        repository: pdb-redo/libpdb-redo
+        path: libpdb-redo
+
+    - name: Build & install libpdb-redo
+      run: |
+        cmake -B ${{github.workspace}}/libpdb-redo/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -S ${{github.workspace}}/libpdb-redo -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
+        cmake --build ${{github.workspace}}/libpdb-redo/build
+        sudo cmake --install ${{github.workspace}}/libpdb-redo/build
+
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}

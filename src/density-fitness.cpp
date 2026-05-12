@@ -35,6 +35,7 @@
 
 #include <cif++/gzio.hpp>
 #include <mcfp/mcfp.hpp>
+#include <memory>
 #include <nlohmann/json.hpp>
 
 #include <pdb-redo/BondMap.hpp>
@@ -225,14 +226,14 @@ int density_fitness_main(int argc, char *const argv[])
 		if (config.has("reshi"))
 			reshi = config.get<float>("reshi");
 		else if (not f["d_resolution_high"].empty())
-			reshi = f["d_resolution_high"].as<float>();
+			reshi = f["d_resolution_high"].get<float>();
 		else
 			throw std::runtime_error("missing high resolution");
 
 		if (config.has("reslo"))
 			reslo = config.get<float>("reslo");
 		else if (not f["d_resolution_low"].empty())
-			reslo = f["d_resolution_low"].as<float>();
+			reslo = f["d_resolution_low"].get<float>();
 		else
 			throw std::runtime_error("missing low resolution");
 
@@ -259,7 +260,7 @@ int density_fitness_main(int argc, char *const argv[])
 
 	if (not output.empty())
 	{
-		outFile.reset(new cif::gzio::ofstream(output));
+		outFile = std::make_unique<cif::gzio::ofstream>(output);
 		out_buffer = outFile->rdbuf();
 
 		if (config.count("output-format") == 0 and output.extension() == ".eds")

@@ -40,10 +40,12 @@ namespace fs = std::filesystem;
 
 // --------------------------------------------------------------------
 
-fs::path gTestDir = fs::current_path();
+fs::path gTestDir;
 
 int main(int argc, char *argv[])
 {
+	gTestDir = fs::current_path();
+
 	Catch::Session session; // There must be exactly one instance
 
 	// Build a new parser on top of Catch2's

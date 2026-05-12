@@ -25,6 +25,18 @@ jobs:
       run: >
         sudo apt-get update && sudo apt-get install catch2 nlohmann-json3-dev libeigen3-dev libccp4-dev libclipper-dev libgsl-dev
 
+    - name: Checkout libmcfp
+      uses: actions/checkout@v4
+      with:
+        repository: https://forge.hekkelman.net/maarten/mcfp.git
+        path: libmcfp
+
+    - name: Build & install libmcfp
+      run: |
+        cmake -B ${{github.workspace}}/libmcfp/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -S ${{github.workspace}}/libmcfp -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
+        cmake --build ${{github.workspace}}/libmcfp/build
+        sudo cmake --install ${{github.workspace}}/libmcfp/build
+
     - name: Checkout libcifpp
       uses: actions/checkout@v4
       with:

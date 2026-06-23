@@ -3,7 +3,7 @@ density-fitness
 
 [![github CI](https://github.com/PDB-REDO/density-fitness/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/PDB-REDO/density-fitness/actions)
 
-This is the repository for density-fitness, an application to calculate density statisctics. This program is part of the [PDB-REDO](https://pdb.redo.eu/) suite
+This is the repository for density-fitness, an application to calculate density statisctics. This program is part of the [PDB-REDO](https://pdb-redo.eu/) suite
 of programs.
 
 Installation

@@ -1,0 +1,60 @@
+cff-version: 1.2.0
+title: density-fitness
+message: >-
+  If you use density-fitness, please reference the preferred
+  citation.
+type: software
+authors:
+  - given-names: Maarten
+    name-particle: L.
+    family-names: Hekkelman
+    email: m.hekkelman@nki.nl
+    affiliation: Netherlands Cancer Insitute
+    orcid: 'https://orcid.org/0000-0002-9081-4707'
+  - given-names: 'Robbie '
+    name-particle: P.
+    family-names: Joosten
+    email: r.joosten@nki.nl
+    affiliation: Netherlands Cancer Insitute
+    orcid: 'https://orcid.org/0000-0002-2323-2686'
+repository-code: 'https://github.com/PDB-REDO/density-fitness'
+abstract: >-
+  density-fitness calculates per-residue electron density
+  metrics (real-space R, real-space correlation coefficient,
+  EDIAm, and OPIA) based on an input model in mmCIF format
+  and reflection data in MTZ format. Map coefficients are
+  used if available, otherwise maps are calculated
+  on-the-fly. Both X-ray and electron diffraction are
+  supported. The output is presented in JSON format.
+keywords:
+  - Electron density
+  - RSR
+  - RSCC
+  - map validation
+  - EDIAm
+license: BSD-2-Clause
+preferred-citation: 
+    type: article
+    doi: 10.1107/S2059798319003875 
+    title: Building and rebuilding N-glycans in protein structure models
+    authors:
+    - given-names: Bart
+      name-particle: van
+      family-names: Beusekom
+    - given-names: Natasja
+      family-names: Wezel
+    - given-names: Maarten L.
+      family-names: Hekkelman
+    - given-names: Anastassis
+      family-names: Perrakis
+    - given-names: Paul
+      family-names: Emsley
+    - given-names: Robbie P.
+      family-names: Joosten
+identifiers:
+  - type: doi
+    value: 10.1107/S0907444911035918
+    description: Original implementation (EDSTATS)
+  - type: doi
+    value: 10.1021/acs.jcim.7b00391
+    description: Algorithms for EDIAm and OPIA.

@@ -150,13 +150,14 @@ _reshi_ and _reslo_ options.
 # References
 
 References:
-
+* Building and rebuilding N-glycans in protein structure models
+  Van Beusekom, B. et al. (2019). Acta Cryst. D75, 416-425.
+  DOI: 10.1107/S2059798319003875
 * Statistical quality indicators for electron-density maps
   Tickle, I. J. (2012). Acta Cryst. D68, 454-467.
   DOI: 10.1107/S0907444911035918
 * Estimating Electron Density Support for Individual Atoms and Molecular Fragments in X-ray Structures
-  Agnes Meyder, Eva Nittinger, Gudrun Lange, Robert Klein, and Matthias Rarey
-  Journal of Chemical Information and Modeling 2017 57 (10), 2437-2447
+  Meyder A., et al. (2017) Journal of Chemical Information and Modeling 57(10), 2437-2447.
   DOI: 10.1021/acs.jcim.7b00391
 
 # Author

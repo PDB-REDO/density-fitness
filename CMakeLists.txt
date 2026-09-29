@@ -25,11 +25,10 @@
 cmake_minimum_required(VERSION 3.25)
 
 # set the project name
-project(density-fitness VERSION 1.2.1 LANGUAGES CXX)
+project(density-fitness VERSION 1.2.2 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-include(FindOrFetch)
 include(GNUInstallDirs)
 include(CTest)
 
@@ -96,7 +95,10 @@ endif()
 
 # Create a revision file, containing the current git version info
 include(VersionString)
-write_version_header("${CMAKE_CURRENT_SOURCE_DIR}/src")
+write_version_header("${CMAKE_CURRENT_BINARY_DIR}")
+
+# Remove any stale header generated in the source tree by older versions
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/revision.hpp")
 
 # Optionally use mrc to create resources
 find_package(mrc QUIET)
@@ -113,11 +115,10 @@ if(USE_RSRC)
 endif()
 
 # libraries
-find_package(nlohmann_json REQUIRED)
+find_package(nlohmann_json 3.11 REQUIRED)
 
-find_or_fetch_package(mcfp VERSION 1.3.5 GIT_REPOSITORY https://github.com/mhekkel/libmcfp GIT_TAG b6c62a3)
-find_or_fetch_package(cifpp VERSION 9 GIT_REPOSITORY https://github.com/PDB-REDO/libcifpp.git GIT_TAG v9.0.5 VARIABLES "CIFPP_SHARE_DIR")
-find_or_fetch_package(pdb-redo VERSION 3.3.0 GIT_REPOSITORY https://github.com/PDB-REDO/libpdb-redo.git GIT_TAG v3.3.0)
+find_package(mcfp 1.3.5 REQUIRED)
+find_package(pdb-redo 3.5.2 REQUIRED)
 
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp

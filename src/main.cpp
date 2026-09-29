@@ -24,8 +24,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdexcept>
+#include <cstdlib>
+#include <exception>
 #include <iostream>
+#include <stdexcept>
 
 #include "density-fitness.hpp"
 

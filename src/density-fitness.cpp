@@ -29,9 +29,19 @@
    Date: woensdag 27 december, 2017
 */
 
+#include <charconv>
+#include <deque>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <memory>
+#include <set>
+#include <streambuf>
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
 
 #include <cif++/gzio.hpp>
 #include <mcfp/mcfp.hpp>
@@ -41,9 +51,11 @@
 #include <pdb-redo/Compound.hpp>
 #include <pdb-redo/Statistics.hpp>
 #include <pdb-redo/Version.hpp>
+#include <stdexcept>
 
 #include "density-fitness.hpp"
 
+#include "cif++/utilities.hpp"
 #include "revision.hpp"
 
 namespace fs = std::filesystem;
@@ -52,9 +64,6 @@ namespace fs = std::filesystem;
 
 int density_fitness_main(int argc, char *const argv[])
 {
-	// this kinda sucks...
-	pdb_redo::force_link = 1;
-
 	auto &config = mcfp::config::instance();
 
 	config.init(
@@ -93,7 +102,7 @@ int density_fitness_main(int argc, char *const argv[])
 	if (config.has("version"))
 	{
 		write_version_string(std::cout, config.has("verbose"));
-		exit(0);
+		return 0;
 	}
 
 	if (config.has("help"))
@@ -138,14 +147,14 @@ int density_fitness_main(int argc, char *const argv[])
 	if (hklin.empty() and not(config.has("fomap") and config.has("dfmap")))
 	{
 		std::cout << config << std::endl;
-		exit(1);
+		return 1;
 	}
 
 	const std::set<std::string> kAnisoOptions{ "none", "calculated", "observed" };
 	if (config.has("aniso-scaling") and kAnisoOptions.count(config.get<std::string>("aniso-scaling")) == 0)
 	{
 		std::cerr << "Invalid option for aniso-scaling, allowed values are none, observed and calculated" << std::endl;
-		exit(1);
+		return 1;
 	}
 
 	if (config.has("quiet"))
@@ -176,13 +185,13 @@ int density_fitness_main(int argc, char *const argv[])
 		throw std::runtime_error("Could not open xyzin file");
 
 	cif::file f = cif::pdb::read(xyzinFile);
+	if (f.empty())
+		throw std::runtime_error("Invalid or empty mmCIF file");
+
 	auto &db = f.front();
 	auto entry_id = db["entry"].empty() ? db.name() : db["entry"].front().get<std::string>("id");
 
 	cif::mm::structure structure(f, 1, cif::mm::structure_open_options{ .skip_hydrogen = true });
-
-	if (f.empty())
-		throw std::runtime_error("Invalid or empty mmCIF file");
 
 	bool electronScattering = config.has("electron-scattering");
 	if (not electronScattering)
@@ -252,14 +261,24 @@ int density_fitness_main(int argc, char *const argv[])
 		r = collector.collect();
 	}
 
-	bool formatAsJSON = config.get<std::string>("output-format") == "json";
+	auto format = config.get<std::string>("output-format");
+	bool formatAsJSON = true;
+	if (format == "eds")
+		formatAsJSON = false;
+	else if (format != "json")
+		throw std::invalid_argument("invalid output format, only 'eds' and 'json' are supported");
 
 	std::unique_ptr<std::ostream> outFile;
 	std::streambuf *out_buffer;
 
 	if (not output.empty())
 	{
-		outFile.reset(new cif::gzio::ofstream(output));
+		auto file = std::make_unique<cif::gzio::ofstream>(output);
+
+		if (not file->is_open())
+			throw std::runtime_error("Failed to open output file");
+
+		outFile = std::move(file);
 		out_buffer = outFile->rdbuf();
 
 		if (config.count("output-format") == 0 and output.extension() == ".eds")
@@ -274,18 +293,22 @@ int density_fitness_main(int argc, char *const argv[])
 	{
 		using object = nlohmann::json;
 
-		object stats;
+		object stats = object::array();
 
-		for (auto i : r)
+		for (auto &i : r)
 		{
 			auto &res = structure.get_residue(i.asymID, i.seqID, i.authSeqID);
+
+			int authSeqID;
+			if (auto r = std::from_chars(i.authSeqID.data(), i.authSeqID.data() + i.authSeqID.length(), authSeqID); r.ec != std::errc{})
+				authSeqID = 0;
 
 			stats.emplace_back(object{
 				{ "asymID", i.asymID },
 				{ "seqID", i.seqID },
 				{ "compID", i.compID },
 				{ "pdb", { { "strandID", res.get_pdb_strand_id() },
-							 { "seqNum", i.authSeqID.empty() ? 0 : stoi(i.authSeqID) },
+							 { "seqNum", authSeqID },
 							 { "compID", i.compID },
 							 { "insCode", res.get_pdb_ins_code() } } },
 				{ "RSR", i.RSR },

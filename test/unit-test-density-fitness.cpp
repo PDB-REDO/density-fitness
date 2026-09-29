@@ -1,17 +1,17 @@
 /*-
  * SPDX-License-Identifier: BSD-2-Clause
- * 
+ *
  * Copyright (c) 2020 NKI/AVL, Netherlands Cancer Institute
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice, this
  *    list of conditions and the following disclaimer
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,26 +24,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <catch2/catch_all.hpp>
+#include "../src/density-fitness.hpp"
 
+#include <catch2/catch_all.hpp>
+#include <cif++/cif++.hpp>
 #include <filesystem>
 #include <fstream>
-#include <stdexcept>
+#include <iostream>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 #include <vector>
-
-#include <cif++/cif++.hpp>
-
-#include "../src/density-fitness.hpp"
+#include <nlohmann/json.hpp>
 
 namespace fs = std::filesystem;
 
 // --------------------------------------------------------------------
 
-fs::path gTestDir = fs::current_path();
+fs::path gTestDir;
 
 int main(int argc, char *argv[])
 {
+	gTestDir = fs::current_path();
+
 	Catch::Session session; // There must be exactly one instance
 
 	// Build a new parser on top of Catch2's
@@ -87,7 +90,7 @@ TEST_CASE("test_1")
 	auto mtz = (gTestDir / "1cbs_map.mtz").string();
 	auto xyz = (gTestDir / "1cbs.cif.gz").string();
 
-	std::vector<const char*> argv{
+	std::vector<const char *> argv{
 		"density-fitness",
 		mtz.c_str(),
 		xyz.c_str(),
@@ -96,7 +99,7 @@ TEST_CASE("test_1")
 		nullptr
 	};
 
-	int r = density_fitness_main(argv.size() - 1, const_cast<char* const *>(argv.data()));
+	int r = density_fitness_main(argv.size() - 1, const_cast<char *const *>(argv.data()));
 
 	std::cout.rdbuf(saved);
 
@@ -116,6 +119,10 @@ TEST_CASE("test_1")
 		if (not getline(ss, line_a) or not getline(reference, line_b))
 			break;
 
+		// If exactly the same, don't bother to look further
+		if (line_a == line_b)
+			continue;
+
 		std::string ra, rb;
 		float va[5], vb[5];
 		int na, nb;
@@ -132,7 +139,43 @@ TEST_CASE("test_1")
 		CHECK_THAT(va[0], Catch::Matchers::WithinRel(vb[0], 0.01f));
 		CHECK_THAT(va[1], Catch::Matchers::WithinRel(vb[1], 0.01f));
 		CHECK_THAT(va[2], Catch::Matchers::WithinRel(vb[2], 0.01f));
-		CHECK_THAT(va[3], Catch::Matchers::WithinRel(vb[3], 0.1f));	// EDIAm flucuates a bit more
-		CHECK_THAT(va[4], Catch::Matchers::WithinRel(vb[4], 0.1f));	// So does OPIA, I guess?
+		CHECK_THAT(va[3], Catch::Matchers::WithinRel(vb[3], 0.1f)); // EDIAm flucuates a bit more
+		CHECK_THAT(va[4], Catch::Matchers::WithinRel(vb[4], 0.1f)); // So does OPIA, I guess?
 	}
+}
+
+TEST_CASE("test_2")
+{
+	// compare json output
+
+	std::stringstream ss;
+
+	auto saved = std::cout.rdbuf(ss.rdbuf());
+
+	auto mtz = (gTestDir / "1cbs_map.mtz").string();
+	auto xyz = (gTestDir / "1cbs.cif.gz").string();
+
+	std::vector<const char *> argv{
+		"density-fitness",
+		mtz.c_str(),
+		xyz.c_str(),
+		"--output-format=json",
+		"--quiet",
+		nullptr
+	};
+
+	int r = density_fitness_main(argv.size() - 1, const_cast<char *const *>(argv.data()));
+
+	std::cout.rdbuf(saved);
+
+	REQUIRE(r == 0);
+
+	std::ifstream reference(gTestDir / "1cbs.json");
+
+	using json = nlohmann::json;
+	
+	json a = json::parse(ss);
+	json b = json::parse(reference);
+
+	CHECK(a == b);
 }

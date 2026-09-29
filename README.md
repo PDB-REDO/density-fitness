@@ -3,7 +3,7 @@ density-fitness
 
 [![github CI](https://github.com/PDB-REDO/density-fitness/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/PDB-REDO/density-fitness/actions)
 
-This is the repository for density-fitness, an application to calculate density statisctics. This program is part of the [PDB-REDO](https://pdb.redo.eu/) suite
+This is the repository for density-fitness, an application to calculate density statistics. This program is part of the [PDB-REDO](https://pdb-redo.eu/) suite
 of programs.
 
 Installation
@@ -33,7 +33,7 @@ cmake --build build
 sudo cmake --install build
 ```
 
-Please note that density-fitness built this way still requires a CCD components.cif file. This file should be located in '/usr/share/libcifpp/' or '/var/cache/libcifpp/'. You can of course also provide your own version of this file using the command line argumentsn (See [options](#options) below).
+Please note that density-fitness built this way still requires a CCD components.cif file. This file should be located in '/usr/share/libcifpp/' or '/var/cache/libcifpp/'. You can of course also provide your own version of this file using the command line arguments (See [options](#options) below).
 
 If you want to install the classic way, you have to install all dependencies first. See the documentation for [`libpdb-redo`](https://github.com/PDB-REDO/libpdb-redo) on installing all prerequisites.
 
@@ -49,9 +49,9 @@ density-fitness - Calculates per-residue electron density scores real-space R, r
 ```
 density-fitness [OPTION] <mtz-file> <coordinates-file> [output]
 
-density-fitness [OPTION] --hklin=<mtz-file> --xyzin=<coordinates-file[--output=<output>]
+density-fitness [OPTION] --hklin=<mtz-file> --xyzin=<coordinates-file> [--output=<output>]
 
-density-fitness [OPTION] --fomap=<fo-map-file> --dfmap=<df-map-file> --reslo=<low-resolution> --reshi=<high-resolution> --xyzin=<input [--output=<output>]
+density-fitness [OPTION] --fomap=<fo-map-file> --dfmap=<df-map-file> --reslo=<low-resolution> --reshi=<high-resolution> --xyzin=<coordinates-file> [--output=<output>]
 ```
 
 # Description
@@ -95,15 +95,18 @@ When using map files, the resolution **must** be specified using the
 _reshi_ and _reslo_ options.
 
 * **--xyzin**
-  The coordinates file in either PDB or mmCIF format. This file may be compressed with gzip.  --fomap and --dfmap
-  The 2mFo-DFc and mFo-DFc map files respectively. Both are required and if these are specified, the resolution
-  must also be specified.
+  The coordinates file in either PDB or mmCIF format. This file may be compressed with gzip.
+
+* **--hklin**
+  The MTZ file containing the observed structure factors. If this option is specified, the maps are calculated
+  using the information in this file.
+
+* **--fomap and --dfmap**
+  The 2mFo-DFc and mFo-DFc map files respectively. Both are required if these are specified, and in that case
+  the resolution must also be specified.
 
 * **--reslo and --reshi**
   The low and high resolution for the specified map files.
-
-* **--hklin**
-  The MTZ file. If this option is specified, the maps will be calculated using the information in this file.
 
 * **--sampling-rate**
   The sampling rate to use when creating maps. Default is 1.5.
@@ -113,50 +116,67 @@ _reshi_ and _reslo_ options.
   structure no longer corresponds to the structure used to calculate the maps in the MTZ file.
 
 * **--aniso-scaling**
-  Accepted values for this option are observed and calculated or none.  Used when recalculating maps.
+  Accepted values for this option are none, observed and calculated. Used when recalculating maps.
 
 * **--no-bulk**
   When specified, a bulk solvent mask is not used in recalculating the maps.
 
-* **--components (or --compounds)**
+* **--compounds**
   Specify the path of the CCD file components.cif. By default the one installed by libcifpp is used, use this
   option to override this default.
 
-* **--extra-compounds**
-  A file containing information for residues in this specific target. This file may be in either CCD or CCP4
-  monomer library format.
+* **--ccd-dict**
+  A dictionary file in CCD format containing information for residues in this specific target. This option can
+  be specified multiple times.
+
+* **--restraint-dict**
+  A file containing restraints for residues in this specific target, in CCP4 monomer library format. This option
+  can be specified multiple times.
 
 * **--mmcif-dictionary**
   Specify the path to the mmcif pdbx dictionary file. The default is to use the dictionary installed by libcifpp,
   use this option to override this default.
 
-* **--no-validate**
-  Omit the validation of the input mmCIF file. This will force output even in case the input file contains errors.
-
 * **--electron-scattering**
   Use electron scattering factors instead of X-ray scattering factors.
+
+* **--no-edia**
+  Skip the EDIA score calculation.
 
 * **--use-auth-ids**
   By default, when reading mmCIF files, the label_xxx_id is used in the edstats output. Use this flag to force
   output with the auth_xxx_ids.
 
 * **--output-format**
-  By default a JSON file is written, unless the filename ends with .eds.  Use this option to force output in
+  By default a JSON file is written, unless the filename ends with .eds. Use this option to force output in
   edstats or json format.
 
-* **--verbose,-V**
+* **--output,-o**
+  Write the output to this file instead of to stdout.
+
+* **--quiet**
+  Do not print any verbose output.
+
+* **--verbose,-v**
   Be more verbose, useful to diagnose validation errors.
+
+* **--version**
+  Print version information and exit.
+
+* **--help,-h**
+  Display the help message and exit.
 
 # References
 
 References:
-
+* Building and rebuilding N-glycans in protein structure models
+  Van Beusekom, B. et al. (2019). Acta Cryst. D75, 416-425.
+  DOI: 10.1107/S2059798319003875
 * Statistical quality indicators for electron-density maps
   Tickle, I. J. (2012). Acta Cryst. D68, 454-467.
   DOI: 10.1107/S0907444911035918
 * Estimating Electron Density Support for Individual Atoms and Molecular Fragments in X-ray Structures
-  Agnes Meyder, Eva Nittinger, Gudrun Lange, Robert Klein, and Matthias Rarey
-  Journal of Chemical Information and Modeling 2017 57 (10), 2437-2447
+  Meyder A., et al. (2017) Journal of Chemical Information and Modeling 57(10), 2437-2447.
   DOI: 10.1021/acs.jcim.7b00391
 
 # Author

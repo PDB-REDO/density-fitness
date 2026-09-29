@@ -1,3 +1,18 @@
+Version 1.2.2
+- Fixed the JSON output, which relied on behaviour of nlohmann_json that is
+  only present in version 3.11 and up; nlohmann_json 3.11 is now required
+- Validate the --output-format option
+- Parse the auth seq id numerically in the JSON output instead of using stoi
+- Generate the revision header in the build directory instead of the source tree
+- Removed the pdb_redo::force_link hack, now handled by libcifpp
+- Versioned the version info registry and dropped noexcept from its constructors
+- Only construct the structure when the input mmCIF file is not empty
+- Raise an error when the output file cannot be opened
+- Marked the mcfp and pdb-redo dependencies as required
+- Synced the README and man page with the actual command line options
+- Added missing standard library includes
+- Various fixes to the GitHub Actions workflow
+
 Version 1.2.1
 - Modfied tests required by changes in libpdb-redo
 

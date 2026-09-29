@@ -36,7 +36,7 @@
 // recursively print exception whats:
 void print_what (const std::exception& e)
 {
-	std::cerr << e.what() << std::endl;
+	std::cerr << e.what() << '\n';
 	try
 	{
 		std::rethrow_if_nested(e);

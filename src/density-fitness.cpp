@@ -29,36 +29,76 @@
    Date: woensdag 27 december, 2017
 */
 
+#include "density-fitness.hpp"
+
+#include "revision.hpp"
+
+#include <boost/math/statistics/linear_regression.hpp>
 #include <charconv>
+#include <cif++/gzio.hpp>
+#include <cif++/model.hpp>
+#include <cif++/utilities.hpp>
 #include <deque>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <mcfp/mcfp.hpp>
 #include <memory>
+#include <nlohmann/json.hpp>
+#include <pdb-redo/BondMap.hpp>
+#include <pdb-redo/Compound.hpp>
+#include <pdb-redo/DensityCalculations.hpp>
+#include <pdb-redo/MapMaker.hpp>
+#include <pdb-redo/Statistics.hpp>
+#include <pdb-redo/Version.hpp>
 #include <set>
-#include <streambuf>
 #include <stdexcept>
+#include <streambuf>
 #include <string>
 #include <system_error>
 #include <vector>
 
-#include <cif++/gzio.hpp>
-#include <mcfp/mcfp.hpp>
-#include <nlohmann/json.hpp>
-
-#include <pdb-redo/BondMap.hpp>
-#include <pdb-redo/Compound.hpp>
-#include <pdb-redo/Statistics.hpp>
-#include <pdb-redo/Version.hpp>
-#include <stdexcept>
-
-#include "density-fitness.hpp"
-
-#include "cif++/utilities.hpp"
-#include "revision.hpp"
-
 namespace fs = std::filesystem;
+
+// --------------------------------------------------------------------
+
+std::tuple<float, float> getLigandValidationScores(const cif::mm::residue &ligand, const pdb_redo::Map<> &xmap)
+{
+	// IDG
+
+	std::vector<float> x, y;
+
+	for (float d : { 0.f, 0.25f, 0.5f, 0.75f, 1.f })
+	{
+		const auto [minD, maxD, avgD, sdD] = pdb_redo::calculateDensityAroundLigand(ligand, xmap, d);
+		x.emplace_back(d);
+		y.emplace_back(avgD);
+	}
+
+	auto [_, slope] = boost::math::statistics::simple_ordinary_least_squares(x, y);
+
+	// FC0.9
+
+	float atomWithDensityCount = 0;
+
+	const float sigma = 0.9f;
+	auto v = sigma * xmap.rmsDensity();
+
+	std::vector<float> densityPerAtom(ligand.atoms().size());
+	for (auto a : ligand.atoms())
+	{
+		clipper::Coord_orth p{ a.get_location().m_x, a.get_location().m_y, a.get_location().m_z };
+		clipper::Coord_frac pf = p.coord_frac(xmap.cell());
+
+		if (xmap.get().interp<clipper::Interp_cubic>(pf) >= v)
+			atomWithDensityCount += 1;
+	}
+
+	auto fc09 = atomWithDensityCount / ligand.atoms().size();
+
+	return { slope, fc09 };
+}
 
 // --------------------------------------------------------------------
 
@@ -91,7 +131,9 @@ int density_fitness_main(int argc, char *const argv[])
 		mcfp::make_option<std::string>("compounds", "Location of the components.cif file from CCD"),
 
 		mcfp::make_option<std::string>("restraint-dict", "File containing restraints for residues in this specific target, can be specified multiple times."),
-		mcfp::make_option<std::string>("ccd-dict", "Dictionary file containing information in CCD format for residues in this specific target, can be specified multiple times.")
+		mcfp::make_option<std::string>("ccd-dict", "Dictionary file containing information in CCD format for residues in this specific target, can be specified multiple times."),
+
+		mcfp::make_option("validate-ligands", "Write out ligand validation scores (JSON format only)")
 
 	);
 
@@ -107,7 +149,7 @@ int density_fitness_main(int argc, char *const argv[])
 
 	if (config.has("help"))
 	{
-		std::cout << config << std::endl;
+		std::cout << config << '\n';
 		return 0;
 	}
 
@@ -146,14 +188,14 @@ int density_fitness_main(int argc, char *const argv[])
 
 	if (hklin.empty() and not(config.has("fomap") and config.has("dfmap")))
 	{
-		std::cout << config << std::endl;
+		std::cout << config << '\n';
 		return 1;
 	}
 
 	const std::set<std::string> kAnisoOptions{ "none", "calculated", "observed" };
 	if (config.has("aniso-scaling") and kAnisoOptions.count(config.get<std::string>("aniso-scaling")) == 0)
 	{
-		std::cerr << "Invalid option for aniso-scaling, allowed values are none, observed and calculated" << std::endl;
+		std::cerr << "Invalid option for aniso-scaling, allowed values are none, observed and calculated" << '\n';
 		return 1;
 	}
 
@@ -261,7 +303,9 @@ int density_fitness_main(int argc, char *const argv[])
 		r = collector.collect();
 	}
 
+	bool validateLigands = config.has("validate-ligands");
 	auto format = config.get<std::string>("output-format");
+
 	bool formatAsJSON = true;
 	if (format == "eds")
 		formatAsJSON = false;
@@ -303,7 +347,7 @@ int density_fitness_main(int argc, char *const argv[])
 			if (auto r = std::from_chars(i.authSeqID.data(), i.authSeqID.data() + i.authSeqID.length(), authSeqID); r.ec != std::errc{})
 				authSeqID = 0;
 
-			stats.emplace_back(object{
+			auto &s = stats.emplace_back(object{
 				{ "asymID", i.asymID },
 				{ "seqID", i.seqID },
 				{ "compID", i.compID },
@@ -317,32 +361,33 @@ int density_fitness_main(int argc, char *const argv[])
 				{ "NGRID", i.ngrid },
 				{ "EDIAm", i.EDIAm },
 				{ "OPIA", i.OPIA } });
+
+			if (validateLigands and res.is_entity() and not res.is_water())
+			{
+				auto [idg, fc09] = getLigandValidationScores(res, mm.fb());
+				s["IDG"] = idg;
+				s["FC0.9"] = fc09;
+			}
 		}
 
-		out << stats << std::endl;
+		out << stats << '\n';
 	}
 	else
 	{
-		out << "RESIDUE" << '\t'
-			<< "RSR" << '\t'
-			<< "SRSR" << '\t'
-			<< "RSCCS" << '\t'
-			<< "NGRID" << '\t'
-			<< "EDIAm" << '\t'
-			<< "OPIA" << std::endl;
+		out << "RESIDUE\tRSR\tSRSR\tRSCCS\tNGRID\tEDIAm\tOPIA";
+		if (validateLigands)
+			out << "\tIDG\tFC0.9";
+		out << '\n';
 
 		bool writeAuth = config.has("use-auth-ids");
 
 		for (auto i : r)
 		{
 			std::string id;
+			auto &res = structure.get_residue(i.asymID, i.seqID, i.authSeqID);
 
 			if (writeAuth)
-			{
-				auto &res = structure.get_residue(i.asymID, i.seqID, i.authSeqID);
-
 				id = i.compID + '_' + res.get_pdb_strand_id() + '_' + res.get_pdb_seq_num() + res.get_pdb_ins_code();
-			}
 			else if (i.compID == "HOH")
 				id = i.compID + '_' + i.asymID + '_' + i.authSeqID;
 			else
@@ -355,7 +400,17 @@ int density_fitness_main(int argc, char *const argv[])
 				<< i.RSCCS << '\t'
 				<< i.ngrid << '\t'
 				<< i.EDIAm << '\t'
-				<< std::setprecision(1) << i.OPIA << std::endl;
+				<< std::setprecision(1) << i.OPIA;
+
+			if (validateLigands and res.is_entity() and not res.is_water())
+			{
+				auto [idg, fc09] = getLigandValidationScores(res, mm.fb());
+				out << std::fixed << std::setprecision(2)
+					<< '\t' << idg
+					<< '\t'<< fc09;
+			}
+
+			out << '\n';
 		}
 	}
 

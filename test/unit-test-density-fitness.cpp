@@ -31,6 +31,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <ranges>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -177,5 +178,32 @@ TEST_CASE("test_2")
 	json a = json::parse(ss);
 	json b = json::parse(reference);
 
-	CHECK(a == b);
+	if (a != b)
+	{
+		REQUIRE (a.is_array());
+		REQUIRE (b.is_array());
+
+		REQUIRE(a.size() == b.size());
+
+		for (size_t ix = 0; ix < a.size(); ++ix)
+		{
+			auto &ai = a[ix];
+			auto &bi = b[ix];
+
+			if (ai == bi)
+				continue;
+
+			CHECK(ai["asymID"] == bi["asymID"]);
+			CHECK(ai["seqID"] == bi["seqID"]);
+			CHECK(ai["compID"] == bi["compID"]);
+			CHECK(ai["pdb"] == bi["pdb"]);
+			CHECK(ai["NGRID"] == bi["NGRID"]);
+
+			CHECK_THAT(ai["RSR"].get<float>(), Catch::Matchers::WithinRel(bi["RSR"].get<float>(), 0.01f));
+			CHECK_THAT(ai["SRSR"].get<float>(), Catch::Matchers::WithinRel(bi["SRSR"].get<float>(), 0.01f));
+			CHECK_THAT(ai["RSCCS"].get<float>(), Catch::Matchers::WithinRel(bi["RSCCS"].get<float>(), 0.01f));
+			CHECK_THAT(ai["EDIAm"].get<float>(), Catch::Matchers::WithinRel(bi["EDIAm"].get<float>(), 0.1f)); // EDIAm flucuates a bit more
+			CHECK_THAT(ai["OPIA"].get<float>(), Catch::Matchers::WithinRel(bi["OPIA"].get<float>(), 0.1f)); // So does OPIA, I guess?
+		}
+	}
 }

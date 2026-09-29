@@ -25,11 +25,10 @@
 cmake_minimum_required(VERSION 3.25)
 
 # set the project name
-project(density-fitness VERSION 1.2.1 LANGUAGES CXX)
+project(density-fitness VERSION 1.2.2 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-include(FindOrFetch)
 include(GNUInstallDirs)
 include(CTest)
 
@@ -100,7 +99,10 @@ endif()
 
 # Create a revision file, containing the current git version info
 include(VersionString)
-write_version_header("${CMAKE_CURRENT_SOURCE_DIR}/src")
+write_version_header("${CMAKE_CURRENT_BINARY_DIR}")
+
+# Remove any stale header generated in the source tree by older versions
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/revision.hpp")
 
 # Optionally use mrc to create resources
 find_package(mrc QUIET)
@@ -117,10 +119,10 @@ if(USE_RSRC)
 endif()
 
 # libraries
-find_package(nlohmann_json REQUIRED)
+find_package(nlohmann_json 3.11 REQUIRED)
 
-find_package(mcfp 1.3.5)
-find_package(pdb-redo 3.5.1)
+find_package(mcfp 1.3.5 REQUIRED)
+find_package(pdb-redo 3.5.2 REQUIRED)
 
 add_executable(density-fitness
 	${PROJECT_SOURCE_DIR}/src/density-fitness.cpp

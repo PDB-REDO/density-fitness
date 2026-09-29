@@ -10,11 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set reusable strings
       id: strings
@@ -33,7 +30,7 @@ jobs:
 
     - name: Build & install libmcfp
       run: |
-        cmake -B ${{github.workspace}}/libmcfp/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -S ${{github.workspace}}/libmcfp -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
+        cmake -B ${{github.workspace}}/libmcfp/build -S ${{github.workspace}}/libmcfp -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
         cmake --build ${{github.workspace}}/libmcfp/build
         sudo cmake --install ${{github.workspace}}/libmcfp/build
 
@@ -45,7 +42,7 @@ jobs:
 
     - name: Build & install libcifpp
       run: |
-        cmake -B ${{github.workspace}}/libcifpp/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -S ${{github.workspace}}/libcifpp -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
+        cmake -B ${{github.workspace}}/libcifpp/build -S ${{github.workspace}}/libcifpp -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
         cmake --build ${{github.workspace}}/libcifpp/build
         sudo cmake --install ${{github.workspace}}/libcifpp/build
 
@@ -57,7 +54,7 @@ jobs:
 
     - name: Build & install libpdb-redo
       run: |
-        cmake -B ${{github.workspace}}/libpdb-redo/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -S ${{github.workspace}}/libpdb-redo -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
+        cmake -B ${{github.workspace}}/libpdb-redo/build -S ${{github.workspace}}/libpdb-redo -DBUILD_DOCUMENTATION=OFF -DBUILD_TESTING=OFF
         cmake --build ${{github.workspace}}/libpdb-redo/build
         sudo cmake --install ${{github.workspace}}/libpdb-redo/build
 
@@ -74,6 +71,4 @@ jobs:
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --build-config Release --output-on-failure -R unit-test-density-fitness
-      env:
-        LIBCIFPP_DATA_DIR: ${{ steps.strings.outputs.build-output-dir }}/_deps/cifpp-src/rsrc
 

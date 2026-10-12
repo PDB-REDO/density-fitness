@@ -133,7 +133,7 @@ if(USE_RSRC)
     mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic ${CIFPP_SHARE_DIR}/mmcif_ddl.dic)
 endif()
 
-target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
+target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(density-fitness PRIVATE pdb-redo::pdb-redo mcfp::mcfp nlohmann_json::nlohmann_json)
 
 install(TARGETS ${PROJECT_NAME}

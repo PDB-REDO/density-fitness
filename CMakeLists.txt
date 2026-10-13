@@ -130,7 +130,7 @@ add_executable(density-fitness
     ${PROJECT_SOURCE_DIR}/src/main.cpp)
 
 if(USE_RSRC)
-    mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic ${CIFPP_SHARE_DIR}/mmcif_ddl.dic)
+    mrc_target_resources(density-fitness ${CIFPP_SHARE_DIR}/mmcif_pdbx.dic)
 endif()
 
 target_include_directories(density-fitness PRIVATE pdb-redo::pdb-redo ${CMAKE_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR})
